@@ -26,27 +26,22 @@ public class minion extends Actor {
     	
     	//Implement Dijkstra's Algorithm for Shortest Route Problems
     	
-    	ArrayList<Location> path = new ArrayList<Location>();
+    	ArrayList<Location> path = new ArrayList<Location>(getLocation()); //path to the end point
+    	ArrayList<Location> checked = new ArrayList<Location>(); //never double check a location that is in checked
+    	ArrayList<Location> emptyAdjacentLocs = getGrid().getEmptyAdjacentLocations(getLocation());
+
+        if(closeToEnd(getLocation()))
+            return end;
+
+        while(!closeToEnd(path.get(path.size() - 1)))
+        {
+            path.add(closestLoc(emptyAdjacentLocs, checked));
+            checked.addAll(emptyAdjacentLocs);
+            
+            emptyAdjacentLocs = getGrid().getEmptyAdjacentLocations(path.get(path.size() - 1));
+        }
     	
-    	ArrayList<Location> emptyAdjacentLocs = getGrid().getEmptyAdjacentLocations(start);
-    	Location nextMove = null;
-    	double minDistance = distance(start, end);
-    	
-    	for(Location loc : emptyAdjacentLocs)
-    	{
-    		if(closeToEnd(loc))
-    			return end;
-    		else
-    		{
-    			if(distance(start, loc) < minDistance)
-    			{
-    				nextMove = loc;
-    				minDistance = distance(start, loc);
-    			}
-    		}
-    	}
-    	
-    	return nextMove;
+    	return path.get(1);
     	
     }
     
@@ -61,16 +56,25 @@ public class minion extends Actor {
     	return Math.sqrt(Math.pow((x1 - x2), 2.0) + Math.pow((y1 - y2), 2.0));
     }
     
-    private double arrayMin(double[] values)
+    private Location closestLoc(ArrayList<Location> locs, ArrayList<Location> checked)
     {
-    	double min = values[0];
-    	for(double value : values)
-    	{
-    		if(value < min)
-    			min = value;
-    	}
-    	
-    	return min;
+        double minDistance = distance(locs.get(0));
+        Location minLoc = locs.get(0);
+        
+        for(Location loc : locs)
+        {
+            double dist = distance(getLocation(), loc);
+            if(dist < minDistance && checked.contains(loc) == false)
+            {
+                minDistance = dist;
+                minLoc = loc;
+            }
+        }
+        
+        if(checked.contains(minLoc))
+            return null;
+        else
+            return minLoc;
     }
     
     private boolean closeToEnd(Location loc)
