@@ -30,9 +30,6 @@ public class minion extends Actor {
     	ArrayList<Location> checked = new ArrayList<Location>(); //never double check a location that is in checked
     	ArrayList<Location> emptyAdjacentLocs = getGrid().getEmptyAdjacentLocations(getLocation());
 
-        if(closeToEnd(getLocation()))
-            return end;
-
         while(!closeToEnd(path.get(path.size() - 1)))
         {
             path.add(closestLoc(emptyAdjacentLocs, checked));
@@ -63,7 +60,7 @@ public class minion extends Actor {
         
         for(Location loc : locs)
         {
-            double dist = distance(getLocation(), loc);
+            double dist = distance(end, loc);
             if(dist < minDistance && checked.contains(loc) == false)
             {
                 minDistance = dist;
