@@ -11,11 +11,13 @@ public class minion extends Actor {
 	
 	private Location start;
 	private Location end;
+	private int health;
 	
     public minion(Location start, Location end) {
     	
     	this.start = start;
     	this.end = end;
+    	health = 100;
     	setColor(null);
     	
     }
@@ -96,4 +98,8 @@ public class minion extends Actor {
     		moveTo(nextMove);
     }
     
+    public void damage(int amount)
+    {
+    	health -= amount;
+    }
 }
