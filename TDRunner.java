@@ -25,16 +25,23 @@ public class TDRunner
 		
 		Scanner scan = new Scanner(System.in);
 		
-		while(true) {
+		while(world.gameMode == 0) {
 			String command = scan.nextLine();
 			command = command.toLowerCase();
 			switch(command) {
+				case "endgame":
+					world.end();
+				break;
+				case "haxm0deronboswag":
+					world.cheater();
+				break;
 				case "barricade":
 				case "firetower":
 				case "watertower":
 				case "moneyhut":
 				case "basictower":
 				case "magetower":
+				case "minion":
 					world.nextType(command);
 				break;
 				default:

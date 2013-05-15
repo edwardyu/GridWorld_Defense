@@ -4,60 +4,98 @@ import info.gridworld.grid.*;
 import info.gridworld.world.*;
 import info.gridworld.actor.*;
 
+import java.awt.*;
+
 import java.util.ArrayList;
 
 
 public class TDWorld extends World<Actor>
 {    
-    private static final String DEFAULT_MESSAGE = "Ronbo was here.";
+    private static String DEFAULT_MESSAGE = "Welcome to Super TD!";
     
     public static final boolean DEBUG = true;
+    
+    public static boolean cheats = false;
+    
+    public final Location startLoc;
+    public final Location endLoc;
+    
+    public static String lastAdded;
+    
+    public int hp;
+    public int gold;
+    
+    public GameComponent nextToAdd;
+    public int gameMode; // 0 - ingame 1 - won 2 - lost
+    
+    public Graphics2D g2;
     
     public void db(Object o) {
     	System.out.println(o.toString());
     }
     
-    public Actor nextToAdd;
     
     public TDWorld()
     {
+        startLoc = new Location(getGrid().getNumRows() - 1, 0);
+        endLoc = new Location(0, getGrid().getNumCols() - 1);
+        load();
     }
+    
+    public TDWorld(Location loc1, Location loc2) {
+    	startLoc = loc1;
+    	endLoc = loc2;
+    	load();
+    } 
 
     public TDWorld(Grid<Actor> grid)
     {
         super(grid);
+        startLoc = new Location(getGrid().getNumRows() - 1, 0);
+        endLoc = new Location(0, getGrid().getNumCols() - 1);
+        load();
+    }
+    
+    public void load() {
+    	gameMode = 0;
+    	gold = 100;
+    	hp = 20;
+    	add(startLoc, new Shade());
+    	add(endLoc, new Shade());
+    }
+    
+    public void cheater() {
+    	cheats = !cheats;
     }
     
     public void nextType(String s) {
     	switch(s) {
     		case "barricade":
     			nextToAdd = new Barricade();
-    			db("barricade");
     		break;
     		case "firetower":
     			nextToAdd = new FireTower();
-    			db("firetower");
     		break;
     		case "watertower":
     			nextToAdd = new WaterTower();
-    			db("watertower");
     		break;
     		case "magetower":
     			nextToAdd = new MageTower();
-    			db("magetower");
     		break;
     		case "moneyhut":
     			nextToAdd = new MoneyHut();
-    			db("moneyhut");
     		break;
     		case "basictower":
     			nextToAdd = new BasicTower();
-    			db("basictower");
+    		break;
+    		case "minion":
+    			nextToAdd = new Minion(startLoc, endLoc);
     		break;
     		default:
     			System.out.println("error 1");
     		break;
     	}
+    	lastAdded = s;
     }
 
     public void show()
@@ -79,8 +117,18 @@ public class TDWorld extends World<Actor>
     {
     	if(nextToAdd == null)
     		return true;
-    	add(loc, nextToAdd);
-    	nextToAdd = null;
+    	if(gold >= nextToAdd.getCost()) {
+    		add(loc, nextToAdd);
+    		gold -= nextToAdd.getCost();
+    	} else {
+    		System.out.println("Sorry, but you don't have enough gold!");
+    	}
+    	
+    	if(!cheats) {
+    		nextToAdd = null;
+    	} else {
+    		nextType(lastAdded);
+    	}
     	return true;
         //return false;
     }
@@ -97,6 +145,11 @@ public class TDWorld extends World<Actor>
             if (a.getGrid() == gr)
                 a.act();
         }
+        if(gr.get(startLoc) == null)
+    		add(startLoc, new Shade());
+        if(gr.get(endLoc) == null)
+    		add(endLoc, new Shade());
+        	
     }
 
     public void add(Location loc, Actor occupant)

@@ -7,13 +7,13 @@ import info.gridworld.actor.*;
 import java.util.ArrayList;
 
 
-public class minion extends Actor {
+public class Minion extends Actor {
 	
 	private Location start;
 	private Location end;
 	private int health;
 	
-    public minion(Location start, Location end) {
+    public Minion(Location start, Location end) {
     	
     	this.start = start;
     	this.end = end;
@@ -28,7 +28,8 @@ public class minion extends Actor {
     	
     	//Implement Dijkstra's Algorithm for Shortest Route Problems
     	
-    	ArrayList<Location> path = new ArrayList<Location>(getLocation()); //path to the end point
+    	ArrayList<Location> path = new ArrayList<Location>(); //path to the end point
+    	path.add(getLocation());
     	ArrayList<Location> checked = new ArrayList<Location>(); //never double check a location that is in checked
     	ArrayList<Location> emptyAdjacentLocs = getGrid().getEmptyAdjacentLocations(getLocation());
 
@@ -41,7 +42,6 @@ public class minion extends Actor {
         }
     	
     	return path.get(1);
-    	
     }
     
     private double distance(Location loc1, Location loc2)
@@ -57,7 +57,7 @@ public class minion extends Actor {
     
     private Location closestLoc(ArrayList<Location> locs, ArrayList<Location> checked)
     {
-        double minDistance = distance(locs.get(0));
+        double minDistance = distance(locs.get(0), end);
         Location minLoc = locs.get(0);
         
         for(Location loc : locs)
@@ -91,11 +91,7 @@ public class minion extends Actor {
     public void act()
     {
     	Location nextMove = getNextMove();
-    	if(getGrid().get(nextMove) instanceof Barricade || getGrid().get(nextMove) instanceof BasicTower)
-    		super.act();
-    			
-    	else
-    		moveTo(nextMove);
+    	moveTo(nextMove);
     }
     
     public void damage(int amount)
