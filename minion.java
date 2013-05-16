@@ -1,8 +1,17 @@
+/*
+ * Minion.java
+ * The Minion class creates a minion whose job is to get to the end square. 
+ * The minion will always take the shortest path to the end, or remove itself if its heatlh is 0 or less. 
+ * @author Edward Yu, Ronbo Fan
+ * @date 5/16/13
+ * @period 6
+ */
 package td;
 
 import info.gridworld.grid.*;
 import info.gridworld.world.*;
 import info.gridworld.actor.*;
+import java.awt.Color;
 
 import java.util.ArrayList;
 import java.util.AbstractSet;
@@ -10,12 +19,12 @@ import java.util.AbstractMap;
 
 public class Minion extends Actor {
 	
-	private Location start;
-	private Location end;
+	private Location start; //the start location for the minion
+	private Location end;  //the target location
 	private int health;
         
-        private HashSet<Location> open;
-        private HashSet<Location> closed;
+        private HashSet<Location> open; //list of possible locations to check 
+        private HashSet<Location> closed; //list of checked locations
         
         private Map<Location, Integer> fcosts; //overall distance from beginning to end
         private Map<Location, Integer> gcosts; //distance from beginning to location
@@ -43,6 +52,7 @@ public class Minion extends Actor {
     public void damage(int amount)
     {
     	health -= amount;
+        setColor(Color.RED);
     }
     
     public ArrayList<Location> getWalkableLocs(Location loc)
@@ -50,6 +60,7 @@ public class Minion extends Actor {
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
         {
+            //remove barricades or minions from walkable locations
             if(adjacentLocs.get(i) instanceof Barricade || adjacentLocs.get(i) instanceof Minion)
                 adjacentLocs.remove(i);
         }
@@ -59,6 +70,7 @@ public class Minion extends Actor {
     
     public int getHcost(Location loc)
     {
+        //manhattan method for estimating distance from end.
         int x1 = loc.getRow();
         int x2 = end.getRow();
         
@@ -72,8 +84,10 @@ public class Minion extends Actor {
     {
         int gCost;
         Location parent = parents.get(loc);
+        //if loc is directly to the side of parent, the cost of moving there is 10
         if(loc.getDirectionToward(parent) % 90 == 0)
             gCost = 10;
+        //if loc is diagonal from parent, then the cost of moving there is 10 * sqrt(2), or approximately 14
         else
             gCost = 14;
         
@@ -86,6 +100,7 @@ public class Minion extends Actor {
     
     public int getFcost(Location loc);
     {
+        //a bit wasteful 
         return getGcost(loc) + getHcost(loc);
     }
     
@@ -123,9 +138,9 @@ public class Minion extends Actor {
             
             for(Location loc : getWalkableLocs(current))
             {
-                if(closed.contains(loc) == false)
+                if(!closed.contains(loc))
                 {
-                    if(open.contains(loc) == false)
+                    if(!open.contains(loc))
                     {
                         open.add(loc);
                         parents.put(loc, current);
@@ -150,19 +165,31 @@ public class Minion extends Actor {
         ArrayList<Location> path = new ArrayList<Location>();
         
         Location parent = parents.get(end);
-        while(path.contains(start) == false)
+        while(!path.contains(start))
         {
 
             path.add(parent);
             parent = parents.get(parent);
         }
         
-        return path.get(path.size() - 2);
+        if(path.size() >= 2)
+            return path.get(path.size() - 2);
+        else
+        {
+            System.out.println("No path to end exists.");
+            return null;
+        }
+            
     }
     
     public void act()
     {
-        moveTo(getNextMove());
+        setColor(null);
+        
+        if(health <= 0)
+            removeSelfFromGrid();
+        else
+            moveTo(getNextMove());
     }
     
 }
