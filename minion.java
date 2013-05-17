@@ -104,20 +104,20 @@ public class Minion extends Actor {
     
     public int getGcost(Location loc)
     {
-        int gCost;
+        int gcost;
         Location parent = parents.get(loc);
         //if loc is directly to the side of parent, the cost of moving there is 10
         if(loc.getDirectionToward(parent) % 90 == 0)
-            gCost = 10;
+            gcost = 10;
         //if loc is diagonal from parent, then the cost of moving there is 10 * sqrt(2), or approximately 14
         else
-            gCost = 14;
+            gcost = 14;
         
         
         if(parent.equals(start))
             return 0;
         else
-            return gCost + getGcost(parent);        
+            return gcost + getGcost(parent);        
     }
     
     public int getFcost(Location loc)
