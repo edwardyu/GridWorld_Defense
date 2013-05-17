@@ -11,7 +11,7 @@ public class TDRunner
 	public static void main(String[] args) 
 	{
 		// Hide the tooltips
- 		System.setProperty("info.gridworld.gui.tooltips", "hide");  
+ 		System.setProperty("info.gridworld.gui.tooltips", "hide");
  			
  		// Include this statement to not highlight a selected cell 		  
  		System.setProperty("info.gridworld.gui.selection", "hide");   	 		    
@@ -30,7 +30,7 @@ public class TDRunner
 			command = command.toLowerCase();
 			switch(command) {
 				case "endgame":
-					world.end();
+					//world.end();
 				break;
 				case "haxm0deronboswag":
 					world.cheater();

@@ -13,9 +13,7 @@ import info.gridworld.world.*;
 import info.gridworld.actor.*;
 import java.awt.Color;
 
-import java.util.ArrayList;
-import java.util.AbstractSet;
-import java.util.AbstractMap;
+import java.util.*;
 
 public class Minion extends Actor {
 	
@@ -30,11 +28,9 @@ public class Minion extends Actor {
         private Map<Location, Integer> gcosts; //distance from beginning to location
         private Map<Location, Integer> hcosts; //distance from end to location
         private Map<Location, Location> parents; 
-        
-        open.add(getLocation());
+  
 	
     public Minion(Location start, Location end) {
-    	
     	this.start = start;
     	this.end = end;
     	health = 100;
@@ -45,7 +41,7 @@ public class Minion extends Actor {
         hcosts = new HashMap<Location, Integer>();
         parents = new HashMap<Location, Location>();
     	setColor(null);
-    	
+    	System.out.println("open size: " + open.size() + "\n" + open);
     }
     
     
@@ -61,7 +57,7 @@ public class Minion extends Actor {
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
         {
             //remove barricades or minions from walkable locations
-            if(adjacentLocs.get(i) instanceof Barricade || adjacentLocs.get(i) instanceof Minion)
+            if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade || getGrid().get(adjacentLocs.get(i)) instanceof Minion)
                 adjacentLocs.remove(i);
         }
         
@@ -98,7 +94,7 @@ public class Minion extends Actor {
             return gCost + getGcost(parent);        
     }
     
-    public int getFcost(Location loc);
+    public int getFcost(Location loc)
     {
         //a bit wasteful 
         return getGcost(loc) + getHcost(loc);
@@ -106,7 +102,12 @@ public class Minion extends Actor {
     
     public Location getMinLocation()
     {
-        Location minLoc = open.get(0);
+    	Object[] loc2 = open.toArray();
+    	Location minLoc = (Location)loc2[0];
+    	System.out.println(loc2[0] + " ddd " + minLoc);
+    	//System.out.println("fcosts: " + fcosts);
+    	if(!fcosts.containsKey(minLoc))
+    		return null;
         int minFcost = fcosts.get(minLoc);
         for(Location loc : open)
         {
@@ -125,9 +126,9 @@ public class Minion extends Actor {
     {
         open.add(start);
         parents.put(start, start);
-        fcosts.put(start, getFcost());
-        gcosts.put(start, getGcost());
-        hcosts.put(start, getHcost());
+        fcosts.put(start, getFcost(start));
+        gcosts.put(start, getGcost(start));
+        hcosts.put(start, getHcost(start));
         
         
         while(!closed.contains(end) && !open.isEmpty())
@@ -144,17 +145,17 @@ public class Minion extends Actor {
                     {
                         open.add(loc);
                         parents.put(loc, current);
-                        fcosts.put(loc, getFcost());
-                        gcosts.put(loc, getGcost());
-                        hcosts.put(loc, getHcost());
+                        fcosts.put(loc, getFcost(start));
+                        gcosts.put(loc, getGcost(start));
+                        hcosts.put(loc, getHcost(start));
                     }
                     else
                     {
                         if(getGcost(loc) < gcosts.get(loc))
                         {
                             parents.put(loc, current);
-                            fcosts.put(loc, getFcost());
-                            gcosts.put(loc, getGcost());
+                            fcosts.put(loc, getFcost(start));
+                            gcosts.put(loc, getGcost(start));
                         }
                     }
 
@@ -181,7 +182,13 @@ public class Minion extends Actor {
         }
             
     }
-    
+    /*
+    public void putSelfInGrid(Grid<Actor> gr, Location loc)
+	{
+		super.putSelfInGrid(gr, loc);
+		open.add(getLocation());
+	}
+	*/
     public void act()
     {
         setColor(null);

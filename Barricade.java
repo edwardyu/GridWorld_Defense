@@ -2,9 +2,9 @@ package td;
 
 import info.gridworld.actor.*;
 
-public class Barricade extends Actor {
+public class Barricade extends Actor implements GameComponent{
 	
-	private static final int COST = 10;
+	private static final int COST = 5;
 	
 	public int getCost() {
 		return COST;

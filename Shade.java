@@ -9,7 +9,7 @@ public class Shade extends Barricade {
 	public boolean isActive;
 
 	public void toggle() {
-		
+		isActive = !isActive;
 	}
 	
 	public Shade() {

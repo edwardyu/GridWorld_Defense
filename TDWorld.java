@@ -25,7 +25,7 @@ public class TDWorld extends World<Actor>
     public int hp;
     public int gold;
     
-    public GameComponent nextToAdd;
+    public Actor nextToAdd;
     public int gameMode; // 0 - ingame 1 - won 2 - lost
     
     public Graphics2D g2;
@@ -69,6 +69,7 @@ public class TDWorld extends World<Actor>
     }
     
     public void nextType(String s) {
+    	db("startLoc: " + startLoc + " endLoc: " + endLoc);
     	switch(s) {
     		case "barricade":
     			nextToAdd = new Barricade();
@@ -117,12 +118,7 @@ public class TDWorld extends World<Actor>
     {
     	if(nextToAdd == null)
     		return true;
-    	if(gold >= nextToAdd.getCost()) {
-    		add(loc, nextToAdd);
-    		gold -= nextToAdd.getCost();
-    	} else {
-    		System.out.println("Sorry, but you don't have enough gold!");
-    	}
+    	add(loc, nextToAdd);
     	
     	if(!cheats) {
     		nextToAdd = null;
