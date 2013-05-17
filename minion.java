@@ -15,7 +15,7 @@ import java.awt.Color;
 
 import java.util.*;
 
-public class Minion extends Actor {
+public class minion extends Actor {
 	
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
@@ -30,7 +30,7 @@ public class Minion extends Actor {
         private Map<Location, Location> parents; 
   
 	
-    public Minion(Location start, Location end) {
+    public minion(Location start, Location end) {
     	this.start = start;
     	this.end = end;
     	health = 100;
@@ -103,15 +103,15 @@ public class Minion extends Actor {
     public Location getMinLocation()
     {
     	Object[] loc2 = open.toArray();
-    	Location minLoc = (Location)loc2[0];
-    	System.out.println(loc2[0] + " ddd " + minLoc);
+    	Location minLoc = (Location) loc2[0];
+    	//System.out.println(loc2[0] + " ddd " + minLoc);
     	//System.out.println("fcosts: " + fcosts);
     	if(!fcosts.containsKey(minLoc))
     		return null;
-        int minFcost = fcosts.get(minLoc);
+        int minFcost = getFcost(minLoc);
         for(Location loc : open)
         {
-            int fcost = fcosts.get(loc);
+            int fcost = getFcost(loc);
             if(fcost <= minFcost)
             {
                 minFcost = fcost;
@@ -125,11 +125,12 @@ public class Minion extends Actor {
     public Location getNextMove()
     {
         open.add(start);
+        /*
         parents.put(start, start);
         fcosts.put(start, getFcost(start));
         gcosts.put(start, getGcost(start));
         hcosts.put(start, getHcost(start));
-        
+        */
         
         while(!closed.contains(end) && !open.isEmpty())
         {
@@ -145,19 +146,17 @@ public class Minion extends Actor {
                     {
                         open.add(loc);
                         parents.put(loc, current);
-                        fcosts.put(loc, getFcost(start));
-                        gcosts.put(loc, getGcost(start));
-                        hcosts.put(loc, getHcost(start));
+                        fcosts.put(loc, getFcost(loc));
+                        gcosts.put(loc, getGcost(loc));
+                        hcosts.put(loc, getHcost(loc));
                     }
-                    else
+                    else if(getGcost(loc) < gcosts.get(loc))
                     {
-                        if(getGcost(loc) < gcosts.get(loc))
-                        {
-                            parents.put(loc, current);
-                            fcosts.put(loc, getFcost(start));
-                            gcosts.put(loc, getGcost(start));
-                        }
+                        parents.put(loc, current);
+                        fcosts.put(loc, getFcost(loc));
+                        gcosts.put(loc, getGcost(loc));
                     }
+                    
 
                 }
             }
@@ -189,11 +188,14 @@ public class Minion extends Actor {
 		open.add(getLocation());
 	}
 	*/
+        @Override
     public void act()
     {
         setColor(null);
         
         if(health <= 0)
+            removeSelfFromGrid();
+        else if(getLocation().equals(end))
             removeSelfFromGrid();
         else
             moveTo(getNextMove());
