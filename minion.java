@@ -15,11 +15,12 @@ import java.awt.Color;
 
 import java.util.*;
 
-public class minion extends Actor {
+public class Minion extends Actor {
 	
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
 	private int health;
+	private int[] fireTicks; //{dps, time}
         
         private HashSet<Location> open; //list of possible locations to check 
         private HashSet<Location> closed; //list of checked locations
@@ -30,9 +31,12 @@ public class minion extends Actor {
         private Map<Location, Location> parents; 
   
 	
-    public minion(Location start, Location end) {
+	private TDWorld world;
+	
+    public Minion(Location start, Location end, TDWorld world) {
     	this.start = start;
     	this.end = end;
+    	this.world = world;
     	health = 100;
         open = new HashSet<Location>();
         closed = new HashSet<Location>();
@@ -44,6 +48,28 @@ public class minion extends Actor {
     	System.out.println("open size: " + open.size() + "\n" + open);
     }
     
+    public void act()
+    {
+        setColor(null);
+        
+        if(health <= 0)
+            removeSelfFromGrid();
+        else {
+            moveTo(getNextMove());
+//        	if(getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) == null || getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) instanceof Shade) {
+//	        	moveTo(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end)));
+//		        if(getLocation().equals(end)) {
+//		        	world.loseLife();
+//		        	removeSelfFromGrid();
+//		        	return;
+//		        }
+//        	}
+        }
+    }
+    
+    public void applyFire(int[] fireDamage) {
+    	fireTicks = fireDamage;
+    }
     
     public void damage(int amount)
     {
@@ -51,7 +77,7 @@ public class minion extends Actor {
         setColor(Color.RED);
     }
     
-    public ArrayList<Location> getWalkableLocs(Location loc)
+   public ArrayList<Location> getWalkableLocs(Location loc)
     {
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
@@ -104,10 +130,9 @@ public class minion extends Actor {
     {
     	Object[] loc2 = open.toArray();
     	Location minLoc = (Location) loc2[0];
-    	//System.out.println(loc2[0] + " ddd " + minLoc);
-    	//System.out.println("fcosts: " + fcosts);
-    	if(!fcosts.containsKey(minLoc))
-    		return null;
+    	//if(!fcosts.containsKey(minLoc))
+    	//	return null;
+    	System.out.println("minloc nignig " + minLoc);
         int minFcost = getFcost(minLoc);
         for(Location loc : open)
         {
@@ -118,7 +143,6 @@ public class minion extends Actor {
                 minLoc = loc;
             }
         }
-        
         return minLoc;
     }
     
@@ -180,25 +204,4 @@ public class minion extends Actor {
             return null;
         }
             
-    }
-    /*
-    public void putSelfInGrid(Grid<Actor> gr, Location loc)
-	{
-		super.putSelfInGrid(gr, loc);
-		open.add(getLocation());
-	}
-	*/
-        @Override
-    public void act()
-    {
-        setColor(null);
-        
-        if(health <= 0)
-            removeSelfFromGrid();
-        else if(getLocation().equals(end))
-            removeSelfFromGrid();
-        else
-            moveTo(getNextMove());
-    }
-    
-}
+    }}

@@ -26,7 +26,7 @@ public class TDWorld extends World<Actor>
     public int gold;
     
     public Actor nextToAdd;
-    public int gameMode; // 0 - ingame 1 - won 2 - lost
+    public boolean gameOver;
     
     public Graphics2D g2;
     
@@ -57,40 +57,61 @@ public class TDWorld extends World<Actor>
     }
     
     public void load() {
-    	gameMode = 0;
+    	gameOver = false;
     	gold = 100;
     	hp = 20;
-    	add(startLoc, new Shade());
-    	add(endLoc, new Shade());
+    	add(startLoc, new Shade(this));
+    	add(endLoc, new Shade(this));
     }
     
     public void cheater() {
     	cheats = !cheats;
     }
     
+    public void takeGold(int toTake) {
+    	gold -= toTake;
+    }
+    
+    public void addGold(int toAdd) {
+    	gold += toAdd;
+    }
+    
+    public int getGold() {
+    	return gold;
+    }
+    
+    public void loseLife() {
+    	hp--;
+    	System.out.println("You have lost a life! You now have " + hp + " lives.");
+    	if(hp == 0) {
+    		gameOver = true;
+    		System.out.println("GAME OVER! You lost!");
+    	}
+    }
+    
     public void nextType(String s) {
     	db("startLoc: " + startLoc + " endLoc: " + endLoc);
     	switch(s) {
     		case "barricade":
-    			nextToAdd = new Barricade();
+    			nextToAdd = new Barricade(this);
     		break;
     		case "firetower":
-    			nextToAdd = new FireTower();
+    			nextToAdd = new FireTower(this);
     		break;
     		case "watertower":
-    			nextToAdd = new WaterTower();
+    		//	nextToAdd = new WaterTower(this);
     		break;
     		case "magetower":
-    			nextToAdd = new MageTower();
+    		//	nextToAdd = new MageTower(this);
     		break;
     		case "moneyhut":
-    			nextToAdd = new MoneyHut();
+    			nextToAdd = new MoneyHut(this);
     		break;
     		case "basictower":
-    			nextToAdd = new BasicTower();
+    			nextToAdd = new BasicTower(this);
     		break;
     		case "minion":
-    			nextToAdd = new Minion(startLoc, endLoc);
+    			nextToAdd = new Minion(startLoc, endLoc, this);
     		break;
     		default:
     			System.out.println("error 1");
@@ -131,6 +152,10 @@ public class TDWorld extends World<Actor>
 
     public void step()
     {
+    	if(gameOver) {
+    		System.out.println("Game over. Please reload Super TD to start a new game.");
+    		return;
+    	}
         Grid<Actor> gr = getGrid();
         ArrayList<Actor> actors = new ArrayList<Actor>();
         for (Location loc : gr.getOccupiedLocations())
@@ -142,9 +167,9 @@ public class TDWorld extends World<Actor>
                 a.act();
         }
         if(gr.get(startLoc) == null)
-    		add(startLoc, new Shade());
+    		add(startLoc, new Shade(this));
         if(gr.get(endLoc) == null)
-    		add(endLoc, new Shade());
+    		add(endLoc, new Shade(this));
         	
     }
 

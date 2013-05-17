@@ -20,19 +20,18 @@ public class TDRunner
 		System.setProperty("info.gridworld.gui.frametitle", "Super TD");
 		
 		TDWorld world = new TDWorld();
-		world.add(new Barricade());
 		world.show();
 		
 		Scanner scan = new Scanner(System.in);
 		
-		while(world.gameMode == 0) {
+		while(!world.gameOver) {
 			String command = scan.nextLine();
 			command = command.toLowerCase();
 			switch(command) {
 				case "endgame":
 					//world.end();
 				break;
-				case "haxm0deronboswag":
+				case "ronboswag":
 					world.cheater();
 				break;
 				case "barricade":
