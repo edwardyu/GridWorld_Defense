@@ -1,7 +1,7 @@
 /*
  * Minion.java
  * The Minion class creates a minion whose job is to get to the end square. 
- * The minion will always take the shortest path to the end, or remove itself if its heatlh is 0 or less. 
+ * The minion will always take the shortest path to the end, or remove itself if its health is 0 or less. 
  * @author Edward Yu, Ronbo Fan
  * @date 5/16/13
  * @period 6
@@ -46,15 +46,27 @@ public class Minion extends Actor {
         hcosts = new HashMap<Location, Integer>();
         parents = new HashMap<Location, Location>();
     	setColor(null);
-    	System.out.println("open size: " + open.size() + "\n" + open);
+    	//System.out.println("open size: " + open.size() + "\n" + open);
     }
     
     public void act()
     {
-        setColor(null);
+        start = getLocation();
+        
         
         if(health <= 0)
+        {
             removeSelfFromGrid();
+            return;
+        }
+        
+        else if(closeToEnd(start))
+        {
+            world.loseLife();
+            removeSelfFromGrid();
+            return;
+        }
+        
         else {
             moveTo(getNextMove());
 //        	if(getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) == null || getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) instanceof Shade) {
@@ -68,7 +80,7 @@ public class Minion extends Actor {
         }
         
         //reset everything
-        start = getLocation();
+//        start = getLocation();
         open = new HashSet<Location>();
         closed = new HashSet<Location>();
         fcosts = new HashMap<Location, Integer>();
@@ -84,10 +96,17 @@ public class Minion extends Actor {
     public void damage(int amount)
     {
     	health -= amount;
-        setColor(Color.RED);
+        //setColor(Color.RED);
     }
     
-   public ArrayList<Location> getWalkableLocs(Location loc)
+    public boolean closeToEnd(Location loc)
+    {
+        if(getGrid().getValidAdjacentLocations(loc).contains(end))
+            return true;
+        else
+            return false;
+    }
+    public ArrayList<Location> getWalkableLocs(Location loc)
     {
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
@@ -117,7 +136,7 @@ public class Minion extends Actor {
         int gcost;
         Location parent = parents.get(loc);
         //if loc is directly to the side of parent, the cost of moving there is 10
-        System.out.println("Parent: " + parent.toString());
+        //System.out.println("Parent: " + parent.toString());
         if(loc.getDirectionToward(parent) % 90 == 0)
             gcost = 10;
         //if loc is diagonal from parent, then the cost of moving there is 10 * sqrt(2), or approximately 14
@@ -143,8 +162,8 @@ public class Minion extends Actor {
     	Location minLoc = (Location) loc2[0];
     	//if(!fcosts.containsKey(minLoc))
     	//	return null;
-    	//System.out.println("minloc nignig " + minLoc);
-        System.out.println("Fcosts: " + fcosts.toString());
+    	//System.out.println("minloc: " + minLoc);
+        //System.out.println("Fcosts: " + fcosts.toString());
         int minFcost = fcosts.get(minLoc);
         for(Location loc : open)
         {
@@ -219,4 +238,5 @@ public class Minion extends Actor {
             return null;
         }
             
-    }}
+    }
+}
