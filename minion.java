@@ -34,9 +34,10 @@ public class Minion extends Actor {
 	private TDWorld world;
 	
     public Minion(Location start, Location end, TDWorld world) {
+        this.world = world;
     	this.start = start;
     	this.end = end;
-    	this.world = world;
+    	
     	health = 100;
         open = new HashSet<Location>();
         closed = new HashSet<Location>();
@@ -65,6 +66,15 @@ public class Minion extends Actor {
 //		        }
 //        	}
         }
+        
+        //reset everything
+        start = getLocation();
+        open = new HashSet<Location>();
+        closed = new HashSet<Location>();
+        fcosts = new HashMap<Location, Integer>();
+        gcosts = new HashMap<Location, Integer>();
+        hcosts = new HashMap<Location, Integer>();
+        parents = new HashMap<Location, Location>();
     }
     
     public void applyFire(int[] fireDamage) {
@@ -107,6 +117,7 @@ public class Minion extends Actor {
         int gcost;
         Location parent = parents.get(loc);
         //if loc is directly to the side of parent, the cost of moving there is 10
+        System.out.println("Parent: " + parent.toString());
         if(loc.getDirectionToward(parent) % 90 == 0)
             gcost = 10;
         //if loc is diagonal from parent, then the cost of moving there is 10 * sqrt(2), or approximately 14
@@ -132,8 +143,9 @@ public class Minion extends Actor {
     	Location minLoc = (Location) loc2[0];
     	//if(!fcosts.containsKey(minLoc))
     	//	return null;
-    	System.out.println("minloc nignig " + minLoc);
-        int minFcost = getFcost(minLoc);
+    	//System.out.println("minloc nignig " + minLoc);
+        System.out.println("Fcosts: " + fcosts.toString());
+        int minFcost = fcosts.get(minLoc);
         for(Location loc : open)
         {
             int fcost = getFcost(loc);
@@ -143,18 +155,21 @@ public class Minion extends Actor {
                 minLoc = loc;
             }
         }
+        
         return minLoc;
     }
     
     public Location getNextMove()
     {
         open.add(start);
-        /*
+        
         parents.put(start, start);
-        fcosts.put(start, getFcost(start));
-        gcosts.put(start, getGcost(start));
         hcosts.put(start, getHcost(start));
-        */
+        gcosts.put(start, getGcost(start));
+        fcosts.put(start, getFcost(start));
+        
+        
+        
         
         while(!closed.contains(end) && !open.isEmpty())
         {
