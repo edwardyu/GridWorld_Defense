@@ -68,7 +68,11 @@ public class Minion extends Actor {
         }
         
         else {
-            moveTo(getNextMove());
+            Location nextMove = getNextMove();
+            if(getGrid().isValid(nextMove))
+                moveTo(nextMove);
+            else
+                System.out.println("No move could be made.");
 //        	if(getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) == null || getGrid().get(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end))) instanceof Shade) {
 //	        	moveTo(getLocation().getAdjacentLocation(getLocation().getDirectionToward(end)));
 //		        if(getLocation().equals(end)) {
@@ -190,7 +194,7 @@ public class Minion extends Actor {
         
         
         
-        while(!closed.contains(end) && !open.isEmpty())
+        while(!closed.contains(end) || !open.isEmpty())
         {
             Location current = getMinLocation();
             open.remove(current);
@@ -220,6 +224,12 @@ public class Minion extends Actor {
             }
         }
         
+        if(!closed.contains(end))
+        {
+            System.out.println("No path to end exists.");
+            return null;
+        }
+        
         ArrayList<Location> path = new ArrayList<Location>();
         
         Location parent = parents.get(end);
@@ -233,10 +243,7 @@ public class Minion extends Actor {
         if(path.size() >= 2)
             return path.get(path.size() - 2);
         else
-        {
-            System.out.println("No path to end exists.");
             return null;
-        }
             
     }
 }
