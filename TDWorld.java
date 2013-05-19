@@ -259,8 +259,7 @@ public class TDWorld extends World<Actor>
             open.remove(current);
             closed.add(current);
             ArrayList<Location> theoreticalLocs = getWalkableLocs(current);
-            if(theoreticalLocs.contains(test))
-                theoreticalLocs.remove(test);
+            theoreticalLocs.remove(test);
             for(Location loc : theoreticalLocs)
             {
                 if(!closed.contains(loc))
@@ -283,6 +282,9 @@ public class TDWorld extends World<Actor>
 
                 }
             }
+            
+            if(open.isEmpty())
+                break;
         }
         
         if(closed.contains(endLoc))
@@ -345,7 +347,8 @@ public class TDWorld extends World<Actor>
     
     public Location getMinLocation()
     {
-    	Object[] loc2 = open.toArray();
+        
+        Object[] loc2 = open.toArray();
     	Location minLoc = (Location) loc2[0];
     	//if(!fcosts.containsKey(minLoc))
     	//	return null;
