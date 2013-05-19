@@ -301,7 +301,7 @@ public class TDWorld extends World<Actor>
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
         {
             //remove barricades or minions from walkable locations
-            if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade || getGrid().get(adjacentLocs.get(i)) instanceof Minion)
+            if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade)
                 adjacentLocs.remove(i);
         }
         
