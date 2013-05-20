@@ -2,9 +2,11 @@
  * Minion.java
  * The Minion class creates a minion whose job is to get to the end square. 
  * The minion will always take the shortest path to the end, or remove itself if its health is 0 or less. 
+ * Once it reaches the end, the player will lose a life. 
  * @author Edward Yu, Ronbo Fan
- * @date 5/16/13
- * @period 6
+ * Period: 6
+ * Date: 5/19/13
+ * 
  */
 package td;
 
@@ -15,11 +17,12 @@ import java.awt.Color;
 
 import java.util.*;
 
-public class Minion extends Actor {
+public class Minion extends Actor 
+{
 	
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
-	private int health;
+	private int health;    //how much health the minion has
 	private int[] fireTicks; //{dps, time}
         
         private HashSet<Location> open; //list of possible locations to check 
@@ -28,7 +31,7 @@ public class Minion extends Actor {
         private Map<Location, Integer> fcosts; //overall distance from beginning to end
         private Map<Location, Integer> gcosts; //distance from beginning to location
         private Map<Location, Integer> hcosts; //distance from end to location
-        private Map<Location, Location> parents; 
+        private Map<Location, Location> parents; //each location points towards its parent square. The parent will eventually reach start
   
 	
 	private TDWorld world;
@@ -49,6 +52,10 @@ public class Minion extends Actor {
     	//System.out.println("open size: " + open.size() + "\n" + open);
     }
     
+    /*
+     * Moves to the best square to get to the end point, as determined by getNextMove(), or removes itself 
+     * from grid if it has no health or if it's close to the end. 
+     */
     public void act()
     {
         start = getLocation();
@@ -80,16 +87,26 @@ public class Minion extends Actor {
         parents = new HashMap<Location, Location>();
     }
     
+    //TODO: Comment here
     public void applyFire(int[] fireDamage) {
     	fireTicks = fireDamage;
     }
     
+    /*
+     * Removes some health from the minion
+     * @param amount the amount of health to be deducted
+     */
     public void damage(int amount)
     {
     	health -= amount;
         //setColor(Color.RED);
     }
     
+    /*
+     * Determines if a location is adjacent to the endpoint
+     * @param loc the location to be checked
+     * @return true if adjacent to endpoint, false otherwise
+     */
     public boolean closeToEnd(Location loc)
     {
         if(getGrid().getValidAdjacentLocations(loc).contains(end))
@@ -97,6 +114,12 @@ public class Minion extends Actor {
         else
             return false;
     }
+    
+    /*
+     * Gets all the locations a minion can move to. A minion cannot eat Barricades or other Minions, but it can eat other Actors.
+     * @param loc the location around which to check for walkable locations.
+     * @return an ArrayList of walkable locations that are adjacent to loc
+     */
     public ArrayList<Location> getWalkableLocs(Location loc)
     {
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
@@ -110,6 +133,12 @@ public class Minion extends Actor {
         return adjacentLocs;
     }
     
+    /*
+     * Estimates the distance from loc to the endpoint using the Manhattan method, which ignores barriers.
+     * The distance is simply the number of rows + the number of columns it takes to get to end.
+     * @param loc the location from which to calculate
+     * @return the estimated distance to end
+     */
     public int getHcost(Location loc)
     {
         //manhattan method for estimating distance from end.
@@ -122,6 +151,12 @@ public class Minion extends Actor {
         return 10 * (int) (Math.abs(x1 - x2) + Math.abs(y1 - y2));
     }
     
+    /*
+     * Recursively estimates the distance from start to loc. Moving horizontally 
+     * or vertically costs 10, but moving diagonally costs 14.
+     * @param loc the location to which to calculate.
+     * @return the estimated distance from start to loc.
+     */
     public int getGcost(Location loc)
     {
         int gcost;
@@ -130,7 +165,8 @@ public class Minion extends Actor {
         //System.out.println("Parent: " + parent.toString());
         if(loc.getDirectionToward(parent) % 90 == 0)
             gcost = 10;
-        //if loc is diagonal from parent, then the cost of moving there is 10 * sqrt(2), or approximately 14
+        //if loc is diagonal from parent, then the cost of moving there is 
+        //10 * sqrt(2), or approximately 14
         else
             gcost = 14;
         
@@ -141,12 +177,22 @@ public class Minion extends Actor {
             return gcost + getGcost(parent);        
     }
     
+    /*
+     * The estimated distance from start to end, assuming we go through loc.
+     * @param loc the location we must go through
+     * @return the estimated distance from start to end (lower is better)
+     */
     public int getFcost(Location loc)
     {
         //a bit wasteful 
         return getGcost(loc) + getHcost(loc);
     }
     
+    /*
+     * Out of all the locations to be checked (in the HashSet open), return the 
+     * location with the lowest estimated distance from beginning to end (fcost).
+     * @return the Location with the lowest fcost (the Location with the lowest estimated distance from beginning to end).
+     */
     public Location getMinLocation()
     {
     	Object[] loc2 = open.toArray();
@@ -169,6 +215,11 @@ public class Minion extends Actor {
         return minLoc;
     }
     
+    /*
+     * Gets the best move for the minion so it follows the shortest path to the end.
+     * Implements the A* pathfinding algorithm.
+     * @return the move which brings it closer to the endpoint.
+     */
     public Location getNextMove()
     {
         open.add(start);
@@ -179,8 +230,8 @@ public class Minion extends Actor {
         fcosts.put(start, getFcost(start));
         
         
-        
-        
+        //check all possible paths
+        //stop if we reach the end or there are no locations left to check
         while(!closed.contains(end) || !open.isEmpty())
         {
             Location current = getMinLocation();
@@ -213,12 +264,15 @@ public class Minion extends Actor {
                 break;
         }
         
+        //no path to end exists
         if(!closed.contains(end))
         {
-            System.out.println("No path to end exists.");
+            //System.out.println("No path to end exists.");
             return getLocation();
         }
         
+        
+        //reverse generate the path to the start, starting from the end. 
         ArrayList<Location> path = new ArrayList<Location>();
         
         Location parent = parents.get(end);
@@ -229,6 +283,7 @@ public class Minion extends Actor {
             parent = parents.get(parent);
         }
         
+        //return the Location right after start
         if(path.size() >= 2)
             return path.get(path.size() - 2);
         else
