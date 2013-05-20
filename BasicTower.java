@@ -5,7 +5,7 @@ import info.gridworld.world.*;
 import info.gridworld.grid.*;
 import java.util.*;
 
-public class BasicTower extends Actor implements GameComponent{
+public class BasicTower extends Barricade implements GameComponent{
 	
 	private static final int COST = 10;
 	private static final int[] upgradeCost = {25, 50, 100};	
@@ -13,7 +13,7 @@ public class BasicTower extends Actor implements GameComponent{
 	private static int[] speed = {5, 3, 1};
 
 	private int level = 1;
-	private TDWorld world;
+	//private TDWorld world;
 	
 	private int timer;
 
@@ -22,7 +22,7 @@ public class BasicTower extends Actor implements GameComponent{
 	}
 	
 	public BasicTower(TDWorld world) {
-		this.world = world;
+		super(world);
 		setColor(null);
 		timer = speed[level - 1];
 	}
@@ -49,8 +49,8 @@ public class BasicTower extends Actor implements GameComponent{
 	}	
 
 	public void upgrade() {
-		if(world.getGold() >= upgradeCost[level - 1]) {
-			world.takeGold(upgradeCost[level - 1]);
+		if(getWorld().getGold() >= upgradeCost[level - 1]) {
+			getWorld().takeGold(upgradeCost[level - 1]);
 			level++;
 		 	System.out.println("Upgraded to level " + level +"!");	
 		} else {

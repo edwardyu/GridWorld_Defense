@@ -1,6 +1,9 @@
 package td;
 
 import info.gridworld.actor.*;
+import info.gridworld.world.*;
+import info.gridworld.grid.*;
+import java.util.ArrayList;
 
 public class MageTower extends BasicTower implements GameComponent{
 	
@@ -17,7 +20,8 @@ public class MageTower extends BasicTower implements GameComponent{
 		return COST;
 	}
 		
-	public MageTower() {
+	public MageTower(TDWorld world) {
+                super(world);
 		setColor(null);
 		timer = speed[level - 1];
 	}
@@ -31,9 +35,10 @@ public class MageTower extends BasicTower implements GameComponent{
 	}
 	
 	public void attack() {
-		ArrayList<Location> ar = getAdjacentLocations(getLocation());
-		for(
-		for(Location l : ar) {
+		ArrayList<Location> ar = getGrid().getValidAdjacentLocations(getLocation());
+
+		for(Location l : ar) 
+                {
 			Actor a = getGrid().get(l);
 			if(a instanceof Minion) {
 				((Minion)a).damage(damage[level - 1]);

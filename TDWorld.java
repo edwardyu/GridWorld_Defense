@@ -178,7 +178,8 @@ public class TDWorld extends World<Actor>
         }
             
     	add(loc, nextToAdd);
-    	
+
+        
     	if(!cheats) {
     		nextToAdd = null;
     	} else {
@@ -300,7 +301,7 @@ public class TDWorld extends World<Actor>
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
         {
-            //remove barricades or minions from walkable locations
+            //remove barricades from walkable locations
             if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade)
                 adjacentLocs.remove(i);
         }

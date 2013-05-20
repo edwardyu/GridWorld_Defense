@@ -19,5 +19,10 @@ public class Barricade extends Actor implements GameComponent{
 	public void act() {
 		
 	}
+        
+        public TDWorld getWorld()
+        {
+            return world;
+        }
 	
 }

@@ -17,7 +17,7 @@ import java.awt.Color;
 
 import java.util.*;
 
-public class Minion extends Actor 
+public class Minion extends Actor implements GameComponent
 {
 	
 	private Location start; //the start location for the minion
@@ -50,6 +50,12 @@ public class Minion extends Actor
         parents = new HashMap<Location, Location>();
     	setColor(null);
     	//System.out.println("open size: " + open.size() + "\n" + open);
+    }
+    
+    //TODO: comment here
+    public int getCost()
+    {
+        return 0;
     }
     
     /*
