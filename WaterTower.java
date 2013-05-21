@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class WaterTower extends BasicTower {
 	
-	private static final int COST = 10;
+	private static final int COST = 100;
 	private static final int[] upgradeCost = {25, 50, 100};	
 	private static int[] damage = {10, 20, 30};
 	private static int[] speed = {5, 3, 1};
@@ -25,22 +25,27 @@ public class WaterTower extends BasicTower {
         {
             int dir = getDirection();
             ArrayList<Location> attackLocations = new ArrayList<Location>();
-            Location loc = getLocation().getAdjacentLocation(dir);
+            
             for(int i = 1; i <= 4; i++)
             {
+                Location loc = getLocation().getAdjacentLocation(dir);
                 while (getGrid().isValid(loc)) 
                 {
+                    if(getGrid().get(loc) != null && !(getGrid().get(loc) instanceof Minion))
+                        break;
                     attackLocations.add(loc);
-                    loc = getLocation().getAdjacentLocation(dir);
+                    loc = loc.getAdjacentLocation(dir);
                 }
                 dir += 90;
                 dir %= 360;
             }
             
+            System.out.println("Attack Locations: " + attackLocations.toString());
             for(Location test : attackLocations)
             {
-                if(getGrid().get(test) instanceof Minion)
-                    ((Minion) getGrid().get(test)).damage(damage[level - 1]);
+                Actor a = getGrid().get(test);
+                if(a instanceof Minion)
+                    ((Minion) a).damage(damage[level - 1]);
                 
             }
             
@@ -48,14 +53,18 @@ public class WaterTower extends BasicTower {
             
         }
         
-    public void upgrade() {
-        if (getWorld().getGold() >= upgradeCost[level - 1]) {
-            getWorld().takeGold(upgradeCost[level - 1]);
-            level++;
-            System.out.println("Upgraded to level " + level + "!");
-        } else {
-            System.out.println("Sorry, but you need " + upgradeCost[level - 1] + " gold to upgrade!");
+        public void upgrade() {
+            if (getWorld().getGold() >= upgradeCost[level - 1]) {
+                getWorld().takeGold(upgradeCost[level - 1]);
+                level++;
+                System.out.println("Upgraded to level " + level + "!");
+            } else {
+                System.out.println("Sorry, but you need " + upgradeCost[level - 1] + " gold to upgrade!");
+            }
         }
-    }
 	
+        public void act()
+        {
+            attack();
+        }
 }

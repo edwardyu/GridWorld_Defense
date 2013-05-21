@@ -131,10 +131,10 @@ public class TDWorld extends World<Actor>
     			nextToAdd = new FireTower(this);
     		break;
     		case "watertower":
-    		//	nextToAdd = new WaterTower(this);
+    			nextToAdd = new WaterTower(this);
     		break;
     		case "magetower":
-    		//	nextToAdd = new MageTower(this);
+    			nextToAdd = new MageTower(this);
     		break;
     		case "moneyhut":
     			nextToAdd = new MoneyHut(this);

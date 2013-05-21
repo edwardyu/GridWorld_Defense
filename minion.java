@@ -64,6 +64,7 @@ public class Minion extends Actor implements GameComponent
      */
     public void act()
     {
+        //setColor(null);
         start = getLocation();
         Location nextMove = getNextMove();
         
@@ -106,6 +107,9 @@ public class Minion extends Actor implements GameComponent
     {
     	health -= amount;
         //setColor(Color.RED);
+        System.out.println("Health: " + health);
+        if(health <= 0)
+            removeSelfFromGrid();
     }
     
     /*
