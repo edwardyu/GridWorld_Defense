@@ -9,7 +9,7 @@ public class WaterTower extends BasicTower {
 	
 	private static final int COST = 100;
 	private static final int[] upgradeCost = {25, 50, 100};	
-	private static int[] damage = {10, 20, 30};
+	private static int[] damageAmount = {10, 20, 30};
 	private static int[] speed = {5, 3, 1};
         private int level = 1;
         private int timer;
@@ -40,17 +40,27 @@ public class WaterTower extends BasicTower {
                 dir %= 360;
             }
             
-            System.out.println("Attack Locations: " + attackLocations.toString());
-            for(Location test : attackLocations)
+            
+            for(Minion m : getMinions())
             {
-                Actor a = getGrid().get(test);
-                if(a instanceof Minion)
-                    ((Minion) a).damage(damage[level - 1]);
-                
+                if(attackLocations.contains(m.getLocation()))
+                    m.damage(damageAmount[level - 1]);
+            }
+
+        }
+        
+        public ArrayList<Minion> getMinions()
+        {
+            ArrayList<Location> occupied = getGrid().getOccupiedLocations();
+            ArrayList<Minion> minions = new ArrayList<Minion>();
+            
+            for(Location l : occupied)
+            {
+                if(getGrid().get(l) instanceof Minion)
+                    minions.add((Minion) getGrid().get(l));
             }
             
-            
-            
+            return minions;
         }
         
         public void upgrade() {

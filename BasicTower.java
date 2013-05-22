@@ -9,7 +9,7 @@ public class BasicTower extends Barricade implements GameComponent{
 	
 	private static final int COST = 10;
 	private static final int[] upgradeCost = {25, 50, 100};	
-	private static int[] damage = {10, 20, 30};
+	private static int[] damageAmount = {10, 20, 30};
 	private static int[] speed = {5, 3, 1};
 
 	private int level = 1;
@@ -43,9 +43,10 @@ public class BasicTower extends Barricade implements GameComponent{
 				m.add((Minion)(getGrid().get(ar.get(k))));
 			}
 		}
-		if(m.size() == 0)
+		if(m.isEmpty())
 			return;
-		m.get((int)(Math.random() * ar.size())).damage(damage[level - 1]);
+		m.get((int)(Math.random() * m.size())).damage(damageAmount[level - 1]);
+                
 	}	
 
 	public void upgrade() {

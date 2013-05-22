@@ -178,7 +178,7 @@ public class TDWorld extends World<Actor>
         }
             
     	add(loc, nextToAdd);
-
+        //nextToAdd.putSelfInGrid(getGrid(), loc);
         
     	if(!cheats) {
     		nextToAdd = null;

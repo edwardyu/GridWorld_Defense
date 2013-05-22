@@ -17,13 +17,15 @@ import java.awt.Color;
 
 import java.util.*;
 
-public class Minion extends Actor implements GameComponent
+public class Minion extends Actor
 {
 	
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
 	private int health;    //how much health the minion has
 	private int[] fireTicks; //{dps, time}
+        private int reward; //money gained from killing a minion
+
         
         private HashSet<Location> open; //list of possible locations to check 
         private HashSet<Location> closed; //list of checked locations
@@ -42,6 +44,7 @@ public class Minion extends Actor implements GameComponent
     	this.end = end;
     	
     	health = 100;
+        reward = 10;
         open = new HashSet<Location>();
         closed = new HashSet<Location>();
         fcosts = new HashMap<Location, Integer>();
@@ -53,10 +56,17 @@ public class Minion extends Actor implements GameComponent
     }
     
     //TODO: comment here
-    public int getCost()
+    public int getReward()
     {
-        return 0;
+        return reward;
     }
+    
+    //TODO: comment here
+    public int getHealth()
+    {
+        return health;
+    }
+    
     
     /*
      * Moves to the best square to get to the end point, as determined by getNextMove(), or removes itself 
@@ -71,6 +81,7 @@ public class Minion extends Actor implements GameComponent
         if(health <= 0)
         {
             removeSelfFromGrid();
+            world.addGold(reward);
             return;
         }
         
@@ -108,8 +119,10 @@ public class Minion extends Actor implements GameComponent
     	health -= amount;
         //setColor(Color.RED);
         System.out.println("Health: " + health);
+        /*
         if(health <= 0)
             removeSelfFromGrid();
+        */
     }
     
     /*
