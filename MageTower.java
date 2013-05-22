@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class MageTower extends BasicTower implements GameComponent{
 	
-	private static final int COST = 100;
+	private static final int COST = 1000;
 	private static final int[] upgradeCost = {150, 300, 600};
 	private static final int[] damage = {100, 200, 300};
 	private static final int[] speed = {7, 6, 5};	
