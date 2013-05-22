@@ -20,9 +20,9 @@ public class Barricade extends Actor implements GameComponent{
 		
 	}
         
-        public TDWorld getWorld()
-        {
+    public TDWorld getWorld()
+    {
             return world;
-        }
+    }
 	
 }

@@ -10,7 +10,7 @@ public class BasicTower extends Barricade implements GameComponent{
 	private static final int COST = 10;
 	private static final int[] upgradeCost = {25, 50, 100};	
 	private static int[] damageAmount = {10, 20, 30};
-	private static int[] speed = {5, 3, 1};
+	private static int[] speed = {3, 2, 1};
 
 	private int level = 1;
 	//private TDWorld world;
@@ -46,7 +46,6 @@ public class BasicTower extends Barricade implements GameComponent{
 		if(m.isEmpty())
 			return;
 		m.get((int)(Math.random() * m.size())).damage(damageAmount[level - 1]);
-                
 	}	
 
 	public void upgrade() {

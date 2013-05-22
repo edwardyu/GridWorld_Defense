@@ -20,6 +20,10 @@ import java.util.*;
 public class Minion extends Actor
 {
 	
+	private static int ID = 1;
+	
+	private int myID;
+	
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
 	private int health;    //how much health the minion has
@@ -39,6 +43,8 @@ public class Minion extends Actor
 	private TDWorld world;
 	
     public Minion(Location start, Location end, TDWorld world) {
+    	myID = ID;
+    	ID++;
         this.world = world;
     	this.start = start;
     	this.end = end;
@@ -78,8 +84,10 @@ public class Minion extends Actor
         start = getLocation();
         Location nextMove = getNextMove();
         
+        
         if(health <= 0)
         {
+        	System.out.println("Minion " + myID + " has been slain.");
             removeSelfFromGrid();
             world.addGold(reward);
             return;
@@ -87,13 +95,18 @@ public class Minion extends Actor
         
         else if(closeToEnd(start))
         {
+        	System.out.println("Minion " + myID + " has successfully attacked your base!");
             world.loseLife();
             removeSelfFromGrid();
             return;
         }
         
-        else if(!getLocation().equals(nextMove))
+        else if(!getLocation().equals(nextMove)) {
+	        if(getGrid().get(nextMove) instanceof Minion) {
+	        	return;
+	        }
             moveTo(nextMove);
+        }
         
         //reset everything
 //        start = getLocation();
@@ -117,8 +130,8 @@ public class Minion extends Actor
     public void damage(int amount)
     {
     	health -= amount;
-        //setColor(Color.RED);
-        System.out.println("Health: " + health);
+        //System.out.println("Health of Minion " + myID +": " + health);
+        
         /*
         if(health <= 0)
             removeSelfFromGrid();
@@ -149,7 +162,7 @@ public class Minion extends Actor
         for(int i = adjacentLocs.size() - 1; i >= 0; i--)
         {
             //remove barricades or minions from walkable locations
-            if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade || getGrid().get(adjacentLocs.get(i)) instanceof Minion)
+            if(getGrid().get(adjacentLocs.get(i)) instanceof Barricade)// || getGrid().get(adjacentLocs.get(i)) instanceof Minion)
                 adjacentLocs.remove(i);
         }
         

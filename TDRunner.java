@@ -34,6 +34,13 @@ public class TDRunner
 				case "ronboswag":
 					world.cheater();
 				break;
+				case "getgold":
+					System.out.println(world.getGold());
+				break;
+				case "addgold":
+					if(world.cheats)
+						world.addGold(100);
+				break;
 				case "barricade":
 				case "firetower":
 				case "watertower":

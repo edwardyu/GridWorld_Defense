@@ -37,12 +37,10 @@ public class MageTower extends BasicTower implements GameComponent{
 	public void attack() {
 		ArrayList<Location> ar = getGrid().getValidAdjacentLocations(getLocation());
 
-		for(Location l : ar) 
-                {
+		for(Location l : ar) {
 			Actor a = getGrid().get(l);
 			if(a instanceof Minion) {
 				((Minion)a).damage(damage[level - 1]);
-				
 			}
 		}
 	}	

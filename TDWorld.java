@@ -16,7 +16,7 @@ public class TDWorld extends World<Actor>
 {    
     private static String DEFAULT_MESSAGE = "Welcome to Super TD!";
     
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     
     public static boolean cheats = false;
     
@@ -90,7 +90,7 @@ public class TDWorld extends World<Actor>
     
     public void load() {
     	gameOver = false;
-    	gold = 100;
+    	gold = 200;
     	hp = 20;
     	add(startLoc, new Shade(this));
     	add(endLoc, new Shade(this));
@@ -122,7 +122,6 @@ public class TDWorld extends World<Actor>
     }
     
     public void nextType(String s) {
-    	db("startLoc: " + startLoc + " endLoc: " + endLoc);
     	switch(s) {
     		case "barricade":
     			nextToAdd = new Barricade(this);
@@ -176,8 +175,16 @@ public class TDWorld extends World<Actor>
             System.out.println("Sorry, you can't place objects to completely block the end path.");
             return true;
         }
-            
-    	add(loc, nextToAdd);
+        
+        if(!(nextToAdd instanceof Minion) && ((Barricade)nextToAdd).getCost() <= gold) {
+        	gold -= ((Barricade)nextToAdd).getCost();
+	        System.out.println("You now have " + gold + " gold."); 
+	    	add(loc, nextToAdd);
+        } else if (nextToAdd instanceof Minion) {
+        	add(loc, nextToAdd);
+    	} else {
+        	System.out.println("Sorry, but you must have " + ((Barricade)nextToAdd).getCost() + " gold to build this structure!");
+        }
         //nextToAdd.putSelfInGrid(getGrid(), loc);
         
     	if(!cheats) {
@@ -197,13 +204,20 @@ public class TDWorld extends World<Actor>
     		return;
     	}
         Grid<Actor> gr = getGrid();
-        ArrayList<Actor> actors = new ArrayList<Actor>();
+        ArrayList<Actor> minions = new ArrayList<Actor>();
         for (Location loc : gr.getOccupiedLocations())
-            actors.add(gr.get(loc));
-
-        for (Actor a : actors)
+            minions.add(gr.get(loc));
+		
+		ArrayList<Actor> towers = (ArrayList<Actor>)minions.clone();
+        for (Actor a : towers)
         {
-            if (a.getGrid() == gr)
+            if (a.getGrid() == gr && a instanceof Barricade)
+                a.act();
+        }
+        		
+        for (Actor a : minions)
+        {
+            if (a.getGrid() == gr && a instanceof Actor)
                 a.act();
         }
         if(gr.get(startLoc) == null)
