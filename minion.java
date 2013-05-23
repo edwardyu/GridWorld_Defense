@@ -61,13 +61,19 @@ public class Minion extends Actor
     	//System.out.println("open size: " + open.size() + "\n" + open);
     }
     
-    //TODO: comment here
+    /*
+     * Gets the amount of gold gained from killing a minion
+     * @return amount of gold
+     */    
     public int getReward()
     {
         return reward;
     }
     
-    //TODO: comment here
+    /*
+     * Gets the current health of the minion
+     * @return health of the minion
+     */
     public int getHealth()
     {
         return health;
@@ -118,7 +124,10 @@ public class Minion extends Actor
         parents = new HashMap<Location, Location>();
     }
     
-    //TODO: Comment here
+    /*
+     * Inflicts fire damage on the minion, which may last for several turns
+     * @param fireDamage array containing [damage per step, amount of time damage is done]
+     */
     public void applyFire(int[] fireDamage) {
     	fireTicks = fireDamage;
     }

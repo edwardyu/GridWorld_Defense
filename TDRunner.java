@@ -1,3 +1,11 @@
+/*
+ * TDRunner.java
+ * The TDRunner class creates a game and runs it. 
+ * @author Edward Yu, Ronbo Fan
+ * Period: 6
+ * Date: 5/19/13
+ * 
+ */
 package td;
 
 import info.gridworld.grid.*;

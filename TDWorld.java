@@ -1,3 +1,12 @@
+/*
+ * TDWorld.java
+ * The TDWorld class creates a grid and manages actors, lives, and attacks. 
+ * This is a tower defense game in which the user places barricades and towers to try and stop minions from reaching the end square.
+ * @author Edward Yu, Ronbo Fan
+ * Period: 6
+ * Date: 5/19/13
+ * 
+ */
 package td;
 
 import info.gridworld.grid.*;
@@ -40,12 +49,18 @@ public class TDWorld extends World<Actor>
     private Map<Location, Integer> hcosts; //distance from end to location
     private Map<Location, Location> parents;
     
-    
+    /*
+     * Easier way to print than System.out.println()
+     * @param o the object to print out.
+     */
     public void db(Object o) {
     	System.out.println(o.toString());
     }
     
-    
+    /*
+     * Constructs a TDWorld and sets the default start locations and end locations
+     * Start is bottom left corner, end is top right corner
+     */
     public TDWorld()
     {
         startLoc = new Location(getGrid().getNumRows() - 1, 0);
@@ -60,6 +75,11 @@ public class TDWorld extends World<Actor>
         parents = new HashMap<Location, Location>();
     }
     
+    /*
+     * Constructs a TDWorld 
+     * @param loc1 the start location
+     * @param loc2 the end location
+     */
     public TDWorld(Location loc1, Location loc2) {
     	startLoc = loc1;
     	endLoc = loc2;
@@ -73,6 +93,10 @@ public class TDWorld extends World<Actor>
         parents = new HashMap<Location, Location>();
     } 
 
+    /*
+     * Constructs a TDWorld
+     * @param grid a grid that the game will be played on
+     */
     public TDWorld(Grid<Actor> grid)
     {
         super(grid);
@@ -88,6 +112,9 @@ public class TDWorld extends World<Actor>
         parents = new HashMap<Location, Location>();
     }
     
+    /*
+     * Loads the default settings for a game.
+     */
     public void load() {
     	gameOver = false;
     	gold = 200;
@@ -96,22 +123,41 @@ public class TDWorld extends World<Actor>
     	add(endLoc, new Shade(this));
     }
     
+    /*
+     * Enables cheat mode, where objects can be added to the grid without retyping the type every time. 
+     */
     public void cheater() {
     	cheats = !cheats;
     }
     
+    /*
+     * Subtracts gold from the stockpile
+     * @param toTake the amount to subtract
+     */
     public void takeGold(int toTake) {
     	gold -= toTake;
     }
     
+    /*
+     * Adds gold the stockpile
+     * @param toAdd the amount to add
+     */
     public void addGold(int toAdd) {
     	gold += toAdd;
     }
     
+    /*
+     * Gets the amount of gold in the stockpile
+     * @return the amount of gold 
+     */
     public int getGold() {
     	return gold;
     }
     
+    /*
+     * Takes a life away from the player.
+     * Stops the game if the players has no lives left.
+     */
     public void loseLife() {
     	hp--;
     	System.out.println("You have lost a life! You now have " + hp + " lives.");
@@ -121,6 +167,10 @@ public class TDWorld extends World<Actor>
     	}
     }
     
+    /*
+     * Takes the users input and stores it so the object can be added.
+     * @param s the name of the object to the added (barricade, basictower, etc.)
+     */
     public void nextType(String s) {
     	switch(s) {
     		case "barricade":
@@ -151,6 +201,9 @@ public class TDWorld extends World<Actor>
     	lastAdded = s;
     }
 
+    /*
+     * Displays the world and default message
+     */
     public void show()
     {
         if (getMessage() == null)
@@ -161,7 +214,7 @@ public class TDWorld extends World<Actor>
     /**
      * This method is called when the user clicks on a location in the
      * WorldFrame.
-     * 
+     * It adds an object to the world if the user has specified one.
      * @param loc the grid location that the user selected
      * @return true if the world consumes the click, or false if the GUI should
      * invoke the Location->Edit menu action
@@ -197,6 +250,9 @@ public class TDWorld extends World<Actor>
         //return false;
     }
 
+    /*
+     * Makes each actor in the world act. Towers and barricades are processed first, then minions.
+     */
     public void step()
     {
     	if(gameOver) {
@@ -227,11 +283,21 @@ public class TDWorld extends World<Actor>
         	
     }
 
+    /*
+     * Adds an actor to the grid
+     * @param loc the location which the actor will be added to
+     * @param occupant the actor to add
+     *
+     */
     public void add(Location loc, Actor occupant)
     {
         occupant.putSelfInGrid(getGrid(), loc);
     }
 
+    /*
+     * Adds an actor to a random location
+     * @param occupant the actor to add
+     */
     public void add(Actor occupant)
     {
         Location loc = getRandomEmptyLocation();
@@ -239,6 +305,11 @@ public class TDWorld extends World<Actor>
             add(loc, occupant);
     }
 
+    /*
+     * Remove an actor from the grid
+     * @param loc the location from which to remove the actor
+     * @return the actor which was removed
+     */
     public Actor remove(Location loc)
     {
         Actor occupant = getGrid().get(loc);
@@ -248,6 +319,11 @@ public class TDWorld extends World<Actor>
         return occupant;
     }
     
+    /*
+     * Don't allow the user to place an object so that the path from start to end is completely blocked.
+     * @param test the location to check for validity
+     * @return true if it doesn't block the path, false otherwise
+     */
     public boolean isValidPlacement(Location test)
     {
         //make sure all hashmaps and hashsets are empty
@@ -310,6 +386,11 @@ public class TDWorld extends World<Actor>
     
     }
     
+    /*
+     * Gets all the locations a minion can move to. A minion cannot eat Barricades or other Minions, but it can eat other Actors.
+     * @param loc the location around which to check for walkable locations.
+     * @return an ArrayList of walkable locations that are adjacent to loc
+     */
     public ArrayList<Location> getWalkableLocs(Location loc)
     {
         ArrayList<Location> adjacentLocs = getGrid().getValidAdjacentLocations(loc);
@@ -323,6 +404,12 @@ public class TDWorld extends World<Actor>
         return adjacentLocs;
     }
     
+    /*
+     * Estimates the distance from loc to the endpoint using the Manhattan method, which ignores barriers.
+     * The distance is simply the number of rows + the number of columns it takes to get to end.
+     * @param loc the location from which to calculate
+     * @return the estimated distance to end
+     */
     public int getHcost(Location loc)
     {
         //manhattan method for estimating distance from end.
@@ -335,6 +422,12 @@ public class TDWorld extends World<Actor>
         return 10 * (int) (Math.abs(x1 - x2) + Math.abs(y1 - y2));
     }
     
+    /*
+     * Recursively estimates the distance from start to loc. Moving horizontally 
+     * or vertically costs 10, but moving diagonally costs 14.
+     * @param loc the location to which to calculate.
+     * @return the estimated distance from start to loc.
+     */
     public int getGcost(Location loc)
     {
         int gcost;
@@ -354,12 +447,22 @@ public class TDWorld extends World<Actor>
             return gcost + getGcost(parent);        
     }
     
+    /*
+     * The estimated distance from start to end, assuming we go through loc.
+     * @param loc the location we must go through
+     * @return the estimated distance from start to end (lower is better)
+     */
     public int getFcost(Location loc)
     {
         //a bit wasteful 
         return getGcost(loc) + getHcost(loc);
     }
     
+    /*
+     * Out of all the locations to be checked (in the HashSet open), return the 
+     * location with the lowest estimated distance from beginning to end (fcost).
+     * @return the Location with the lowest fcost (the Location with the lowest estimated distance from beginning to end).
+     */
     public Location getMinLocation()
     {
         

@@ -1,3 +1,11 @@
+/*
+ * MageTower.java
+ * A MageTower damages all minions adjacent to it, usually killing it instantly.
+ * @author Edward Yu, Ronbo Fan
+ * Period: 6
+ * Date: 5/19/13
+ * 
+ */
 package td;
 
 import info.gridworld.actor.*;

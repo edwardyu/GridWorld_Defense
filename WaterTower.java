@@ -1,4 +1,4 @@
-package td;
+ package td;
 
 import info.gridworld.actor.*;
 import info.gridworld.world.*;
@@ -75,6 +75,10 @@ public class WaterTower extends BasicTower {
 	
         public void act()
         {
-            attack();
+            timer--;
+            if (timer == 0) {
+                attack();
+                timer = speed[level - 1];
+             }
         }
 }

@@ -2,7 +2,7 @@ package td;
 
 import info.gridworld.actor.*;
 
-public class MoneyHut extends Actor implements GameComponent{
+public class MoneyHut extends Barricade implements GameComponent{
 	
 	private static final int COST = 100;
 	private static final int[] upgradeCost = {50, 100, 200};
@@ -10,14 +10,14 @@ public class MoneyHut extends Actor implements GameComponent{
 
 	private int timer;
 	private int level = 1;
-	private TDWorld world;
+	//private TDWorld world;
 	
 	public int getCost() {
 		return COST;
 	}
 	
 	public MoneyHut(TDWorld world) {
-		this.world = world;
+		super(world);
 		setColor(null);
 		timer = speed[0];
 	}
@@ -27,14 +27,14 @@ public class MoneyHut extends Actor implements GameComponent{
 		if(timer == 0) {
 			timer = speed[level - 1];
 			int gold = (int)(Math.random() * (7 * level) + (level * 5));
-			world.addGold(gold);
+			getWorld().addGold(gold);
 			System.out.println("Money Hut generated " + gold + " gold!");
 		}
 	}
 
 	public void upgrade() {
-		if(world.getGold() >= upgradeCost[level - 1]) {
-			world.takeGold(upgradeCost[level - 1]);
+		if(getWorld().getGold() >= upgradeCost[level - 1]) {
+			getWorld().takeGold(upgradeCost[level - 1]);
 			level++;
 		 	System.out.println("Upgraded to level " + level +"!");	
 		} else {

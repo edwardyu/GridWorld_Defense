@@ -1,3 +1,11 @@
+/*
+ * FireTower.java
+ * A FireTower damages all minions adjacent to it, and also applies fire damage, which burns the minion over a period of time.
+ * @author Edward Yu, Ronbo Fan
+ * Period: 6
+ * Date: 5/19/13
+ * 
+ */
 package td;
 
 import info.gridworld.actor.*;
@@ -5,7 +13,8 @@ import info.gridworld.world.*;
 import info.gridworld.grid.*;
 import java.util.*;
 
-public class FireTower extends BasicTower implements GameComponent{
+public class FireTower extends BasicTower implements GameComponent
+{
 	
 	private static final int COST = 50;
 	private static final int[] upgradeCost = {50, 150, 300};
@@ -17,17 +26,30 @@ public class FireTower extends BasicTower implements GameComponent{
 	//private TDWorld world;
 
 	private int timer;
-
+        
+    /*
+     * Gets the amount of money needed to build a FireTower
+     * @return amount of money needed to build a FireTower
+     */
 	public int getCost() {
 		return COST;
 	}
 	
+    /*
+     * Constructs a FireTower
+     * @param world the world which controls the tower
+     */	
 	public FireTower(TDWorld world) {
 		super(world);
 		setColor(null);
 		timer = speed[level - 1];
 	}
-	
+        
+    /*
+     * The tower will attack every few turns, at a speed determined by the timer. 
+     * The timer's speed is determined by the level.
+     * 
+     */	
 	public void act() {
 		timer--;
 		if(timer == 0) {	
@@ -35,7 +57,10 @@ public class FireTower extends BasicTower implements GameComponent{
 			timer = speed[level - 1];
 		}
 	}
-	
+        
+    /*
+     * Attack all minions in adjacent locations
+     */
 	public void attack() {
 		ArrayList<Location> ar = getGrid().getOccupiedAdjacentLocations(getLocation());
 		for(Location l : ar) {
@@ -45,8 +70,11 @@ public class FireTower extends BasicTower implements GameComponent{
 				((Minion)a).applyFire(fireDamage[level - 1]);
 			}
 		}
-	}	
-
+	}
+        
+    /*
+     * Upgrade a FireTower to the next level. This will increase its damage, speed, and cost.
+     */
 	public void upgrade() {
 		if(getWorld().getGold() >= upgradeCost[level - 1]) {
 			getWorld().takeGold(upgradeCost[level - 1]);
