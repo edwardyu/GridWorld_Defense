@@ -1,11 +1,20 @@
- package td;
+/*
+ * WaterTower.java
+ * A WaterTower damages all minions in all cardinal directions. It is blocked by barricades and other towers.
+ * @author Edward Yu, Ronbo Fan
+ * Period: 6
+ * Date: 5/19/13
+ * 
+ */ 
+package td;
 
 import info.gridworld.actor.*;
 import info.gridworld.world.*;
 import info.gridworld.grid.*;
 import java.util.ArrayList;
 
-public class WaterTower extends BasicTower {
+public class WaterTower extends BasicTower implements GameComponent
+{
 	
 	private static final int COST = 100;
 	private static final int[] upgradeCost = {25, 50, 100};	
@@ -13,14 +22,31 @@ public class WaterTower extends BasicTower {
 	private static int[] speed = {5, 3, 1};
         private int level = 1;
         private int timer;
+
+        /*
+         * Gets the amount of money needed to build a MoneyHut
+         * @return amount of money needed to build a MoneyHut
+         */
+        public int getCost() 
+        {
+            return COST;
+        }
         
+    /*
+     * Constructs a MageTower
+     * @param world the world which controls the tower
+     */
 	public WaterTower(TDWorld world) 
         {
             super(world);
             setColor(null);
             timer = speed[level - 1];
 	}
-	
+        
+    /*
+     * Attack all minions in all cardinal directions.
+     * More than one minion can be damaged in the attack.
+     */       
         public void attack()
         {
             int dir = getDirection();
@@ -49,6 +75,10 @@ public class WaterTower extends BasicTower {
 
         }
         
+        /*
+         * Get all the Minions in the grid
+         * @return an ArrayList of all the minions in the grid.
+         */
         public ArrayList<Minion> getMinions()
         {
             ArrayList<Location> occupied = getGrid().getOccupiedLocations();
@@ -62,7 +92,10 @@ public class WaterTower extends BasicTower {
             
             return minions;
         }
-        
+
+    /*
+     * Upgrade a MageTower to the next level. This will increase its damage, speed, and cost.
+     */
         public void upgrade() {
             if (getWorld().getGold() >= upgradeCost[level - 1]) {
                 getWorld().takeGold(upgradeCost[level - 1]);
@@ -72,7 +105,12 @@ public class WaterTower extends BasicTower {
                 System.out.println("Sorry, but you need " + upgradeCost[level - 1] + " gold to upgrade!");
             }
         }
-	
+        
+    /*
+     * The tower will attack every few turns, at a speed determined by the timer. 
+     * The timer's speed is determined by the level.
+     * 
+     */	
         public void act()
         {
             timer--;

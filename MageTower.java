@@ -23,17 +23,30 @@ public class MageTower extends BasicTower implements GameComponent{
 	private int level = 1;
 
 	private int timer;
-
+        
+    /*
+     * Gets the amount of money needed to build a MageTower
+     * @return amount of money needed to build a MageTower
+     */
 	public int getCost() {
 		return COST;
 	}
-		
+	
+    /*
+     * Constructs a MageTower
+     * @param world the world which controls the tower
+     */
 	public MageTower(TDWorld world) {
                 super(world);
 		setColor(null);
 		timer = speed[level - 1];
 	}
-	
+
+    /*
+     * The tower will attack every few turns, at a speed determined by the timer. 
+     * The timer's speed is determined by the level.
+     * 
+     */
 	public void act() {
 		timer--;
 		if(timer == 0) {	
@@ -41,7 +54,10 @@ public class MageTower extends BasicTower implements GameComponent{
 			timer = speed[level - 1];
 		}
 	}
-	
+
+    /*
+     * Attack all minions in adjacent locations
+     */
 	public void attack() {
 		ArrayList<Location> ar = getGrid().getValidAdjacentLocations(getLocation());
 
@@ -53,6 +69,9 @@ public class MageTower extends BasicTower implements GameComponent{
 		}
 	}	
 
+    /*
+     * Upgrade a MageTower to the next level. This will increase its damage, speed, and cost.
+     */
 	public void upgrade() {
 		if(getWorld().getGold() >= upgradeCost[level - 1]) {
 			getWorld().takeGold(upgradeCost[level - 1]);
