@@ -49,6 +49,7 @@ public class MoneyHut extends Barricade implements GameComponent{
 			int gold = (int)(Math.random() * (7 * level) + (level * 5));
 			getWorld().addGold(gold);
 			System.out.println("Money Hut generated " + gold + " gold!");
+                        getWorld().printGold();
 		}
 	}
 /*

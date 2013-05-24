@@ -16,7 +16,7 @@ import java.util.*;
 public class FireTower extends BasicTower implements GameComponent
 {
 	
-	private static final int COST = 50;
+	private static final int COST = 100;
 	private static final int[] upgradeCost = {50, 150, 300};
 	private static final int[] damage = {25, 35, 45};
 	private static final int[] speed = {7, 6, 5};	

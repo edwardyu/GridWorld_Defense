@@ -21,7 +21,6 @@ public class BasicTower extends Barricade implements GameComponent{
     private static int[] speed = {3, 2, 1};
 
     private int level = 1;
-    //private TDWorld world;
 
     private int timer;
 

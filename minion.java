@@ -62,6 +62,15 @@ public class Minion extends Actor
     }
     
     /*
+     * Sets the starting health of a minion
+     * @param hp starting HP
+     */
+    
+    public void setHP(int hp) {
+    	health = hp;
+    }
+    
+    /*
      * Gets the amount of gold gained from killing a minion
      * @return amount of gold
      */    
@@ -93,9 +102,10 @@ public class Minion extends Actor
         
         if(health <= 0)
         {
-        	System.out.println("Minion " + myID + " has been slain.");
+            System.out.println("Minion " + myID + " has been slain.");
             removeSelfFromGrid();
             world.addGold(reward);
+            world.printGold();
             return;
         }
         

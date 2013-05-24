@@ -31,7 +31,7 @@ public class TDRunner
 		world.show();
 		
 		Scanner scan = new Scanner(System.in);
-		
+		world.instructions();
 		while(!world.gameOver) {
 			String command = scan.nextLine();
 			command = command.toLowerCase();

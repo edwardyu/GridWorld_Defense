@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class WaterTower extends BasicTower implements GameComponent
 {
 	
-	private static final int COST = 100;
+	private static final int COST = 50;
 	private static final int[] upgradeCost = {25, 50, 100};	
 	private static int[] damageAmount = {10, 20, 30};
 	private static int[] speed = {5, 3, 1};
@@ -70,7 +70,12 @@ public class WaterTower extends BasicTower implements GameComponent
             for(Minion m : getMinions())
             {
                 if(attackLocations.contains(m.getLocation()))
+                {
                     m.damage(damageAmount[level - 1]);
+                    return;
+                }
+                    
+                
             }
 
         }

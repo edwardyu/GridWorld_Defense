@@ -40,6 +40,12 @@ public class TDWorld extends World<Actor>
     public Actor nextToAdd;
     public boolean gameOver;
     
+    private boolean gameStarted;
+    
+    private int timer;
+    private int level = 1;
+    private int minionsAdded = 0;
+    
     public Graphics2D g2;
     
     private HashSet<Location> open; //list of possible locations to check 
@@ -116,8 +122,11 @@ public class TDWorld extends World<Actor>
      * Loads the default settings for a game.
      */
     public void load() {
+    	gameStarted = false;
+    	timer = 10; //game starts in 10 steps
+        level = 1;
     	gameOver = false;
-    	gold = 200;
+    	gold = 50;
     	hp = 20;
     	add(startLoc, new Shade(this));
     	add(endLoc, new Shade(this));
@@ -152,6 +161,15 @@ public class TDWorld extends World<Actor>
      */
     public int getGold() {
     	return gold;
+        
+    }
+    
+    /*
+     * prints the amount of gold the user has
+     */
+    public void printGold()
+    {
+        System.out.println("You currently have " + gold + " gold.");
     }
     
     /*
@@ -165,6 +183,33 @@ public class TDWorld extends World<Actor>
     		gameOver = true;
     		System.out.println("GAME OVER! You lost!");
     	}
+    }
+    
+    /*
+     * Gets the HP that each minion should have, based on the level
+     * @return recommened HP for minion
+     */
+    public int getHP()
+    {
+        return level * level * 5;
+    }
+    
+    /*
+     * The number of minions in a level
+     * @return number of minions, dependant on level
+     */
+    public int getNumMinions()
+    {
+        return 2 * level;
+    }
+    
+    /*
+     * The gold bonus for completing a level
+     * @return gold bonus, dependent on level
+     */
+    public int getGoldBonus()
+    {
+        return 5 * level;
     }
     
     /*
@@ -221,6 +266,13 @@ public class TDWorld extends World<Actor>
      */
     public boolean locationClicked(Location loc)
     {
+        if(getGrid().get(loc) instanceof Barricade)
+        {
+            gold += ((Barricade) getGrid().get(loc)).getCost();
+            remove(loc);
+            printGold();
+        }
+        
     	if(nextToAdd == null)
     		return true;
         if(!isValidPlacement(loc))
@@ -229,13 +281,19 @@ public class TDWorld extends World<Actor>
             return true;
         }
         
-        if(!(nextToAdd instanceof Minion) && ((Barricade)nextToAdd).getCost() <= gold) {
+        if(!(nextToAdd instanceof Minion) && ((Barricade)nextToAdd).getCost() <= gold) 
+        {
         	gold -= ((Barricade)nextToAdd).getCost();
 	        System.out.println("You now have " + gold + " gold."); 
 	    	add(loc, nextToAdd);
-        } else if (nextToAdd instanceof Minion) {
-        	add(loc, nextToAdd);
-    	} else {
+        } 
+        else if (nextToAdd instanceof Minion)
+        {
+                if(cheats)
+                    add(loc, nextToAdd);
+    	} 
+        else 
+        {
         	System.out.println("Sorry, but you must have " + ((Barricade)nextToAdd).getCost() + " gold to build this structure!");
         }
         //nextToAdd.putSelfInGrid(getGrid(), loc);
@@ -250,11 +308,29 @@ public class TDWorld extends World<Actor>
         //return false;
     }
 
+	/*
+	 * Prints the instructions for playing the game
+	 */
+    public void instructions() 
+    {
+       System.out.println("Welcome to GridDefense!");
+       System.out.println("Wave 1 will begin when you press Run.");
+       System.out.println("The speed of each step may be adjusted in the Run Speed slider below.");
+       printGold();
+    }
+
     /*
      * Makes each actor in the world act. Towers and barricades are processed first, then minions.
      */
     public void step()
     {
+    	if(!gameStarted) {
+        	gameStarted = true;
+    	}
+    	if(timer > 0) {
+    		timer--;
+    		return;
+    	}
     	if(gameOver) {
     		System.out.println("Game over. Please reload Super TD to start a new game.");
     		return;
@@ -280,7 +356,30 @@ public class TDWorld extends World<Actor>
     		add(startLoc, new Shade(this));
         if(gr.get(endLoc) == null)
     		add(endLoc, new Shade(this));
-        	
+    	/*if not all minions have been spawned*/
+        if(minionsAdded < getNumMinions()) {
+                Minion m =  new Minion(startLoc, endLoc, this);
+                m.setHP(getHP());
+        	add(startLoc, m);
+        	minionsAdded++;
+        }
+        boolean allDead = true;
+        for(Location loc : gr.getOccupiedLocations()) {
+        	if(gr.get(loc) instanceof Minion)
+        		allDead = false;
+        }
+        if(allDead) {
+        	gold += getGoldBonus();
+        	timer = 10;
+        	level++;
+        	minionsAdded = 0;
+                
+        	System.out.println("Congratulations! Wave " + (level) + " will commence when you press Run.");
+                System.out.println("Minions: " + 2 * level);
+                System.out.println("Minion health: " + level * level * 2);
+                
+                printGold();
+        }
     }
 
     /*
