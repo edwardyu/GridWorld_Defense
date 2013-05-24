@@ -12,6 +12,7 @@ package td;
 import info.gridworld.grid.*;
 import info.gridworld.world.*;
 import info.gridworld.actor.*;
+import info.gridworld.gui.*;
 
 import java.awt.*;
 
@@ -373,7 +374,6 @@ public class TDWorld extends World<Actor>
         	timer = 10;
         	level++;
         	minionsAdded = 0;
-                
         	System.out.println("Congratulations! Wave " + (level) + " will commence when you press Run.");
                 System.out.println("Minions: " + 2 * level);
                 System.out.println("Minion health: " + level * level * 2);
