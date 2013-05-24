@@ -1,0 +1,6 @@
+*menu
+*high scores
+*don't allow user to place or remove minions
+*auto stop after each wave
+*tutorial
+*allow user to upgrade barricades
