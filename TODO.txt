@@ -4,3 +4,5 @@
 *auto stop after each wave
 *tutorial
 *allow user to upgrade barricades
+*comment new files
+*instantiate with bigger grid
