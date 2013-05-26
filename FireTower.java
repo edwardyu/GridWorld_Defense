@@ -1,3 +1,4 @@
+package td;
 /*
  * FireTower.java
  * A FireTower damages all minions adjacent to it, and also applies fire damage, which burns the minion over a period of time.
@@ -6,10 +7,9 @@
  * Date: 5/19/13
  * 
  */
-package td;
+
 
 import info.gridworld.actor.*;
-import info.gridworld.world.*;
 import info.gridworld.grid.*;
 import java.util.*;
 
@@ -23,16 +23,25 @@ public class FireTower extends BasicTower implements GameComponent
 	private static final int[][] fireDamage = { {2,5}, {4,5}, {7,10} };
 
 	private int level = 1;
-	//private TDWorld world;
 
 	private int timer;
-        
+    public int getLevel() {
+    	return level;
+    }
+    public void levelUp() {
+    	level++;
+    }
     /*
      * Gets the amount of money needed to build a FireTower
      * @return amount of money needed to build a FireTower
      */
+
 	public int getCost() {
 		return COST;
+	}
+	
+	public int[] getUpgradeCost() {
+		return upgradeCost;
 	}
 	
     /*

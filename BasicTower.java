@@ -1,3 +1,4 @@
+package td;
 /*
  * BasicTower.java
  * A BasicTower randomly selects a minion adjacent to it and inflicts damage to it.
@@ -6,10 +7,8 @@
  * Date: 5/19/13
  * 
  */
-package td;
 
-import info.gridworld.actor.*;
-import info.gridworld.world.*;
+
 import info.gridworld.grid.*;
 import java.util.*;
 
@@ -23,8 +22,40 @@ public class BasicTower extends Barricade implements GameComponent{
     private int level = 1;
 
     private int timer;
+    
+    public int getLevel() {
+    	return level;
+    }
+    
+    public void levelUp() {
+    	level++;
+    }
+    
+	public String getImageSuffix() { 
+		if (level == 1) {
+			return "";
+		}
+		else if (level == 2) {
+			return "_2";
+		}
+		else {
+			return "_3"; 
+		}
+	} 
+    
+    /*
+     * Gets the amount of money needed to build a BasicTower
+     * @return amount of money needed to build a BasicTower
+     */
 
-
+	public int getCost() {
+		return COST;
+	}
+	
+	public int[] getUpgradeCost() {
+		return upgradeCost;
+	}
+	
 /*
  * Constructs a BasicTower
  * @param world the world which controls the tower
@@ -33,14 +64,6 @@ public class BasicTower extends Barricade implements GameComponent{
             super(world);
             setColor(null);
             timer = speed[level - 1];
-    }
-
-    /*
-     * Gets the amount of money needed to build a BasicTower
-     * @return amount of money needed to build a BasicTower
-     */
-    public int getCost() {
-        return COST;
     }
 
     /*

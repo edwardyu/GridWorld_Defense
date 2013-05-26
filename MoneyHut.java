@@ -1,3 +1,4 @@
+package td;
 /*
  * MoneyHut.java
  * A MoneyHut generates money, like an investment.
@@ -6,11 +7,9 @@
  * Date: 5/19/13
  * 
  */
-package td;
 
-import info.gridworld.actor.*;
 
-public class MoneyHut extends Barricade implements GameComponent{
+public class MoneyHut extends BasicTower implements GameComponent{
 	
 	private static final int COST = 100;
 	private static final int[] upgradeCost = {50, 100, 200};
@@ -18,16 +17,21 @@ public class MoneyHut extends Barricade implements GameComponent{
 
 	private int timer;
 	private int level = 1;
-	//private TDWorld world;
-        
-    /*
-     * Gets the amount of money needed to build a MoneyHut
-     * @return amount of money needed to build a MoneyHut
-     */	
+	
+    public int getLevel() {
+    	return level;
+    }
+    public void levelUp() {
+    	level++;
+    }
+	
 	public int getCost() {
 		return COST;
 	}
-
+	
+	public int[] getUpgradeCost() {
+		return upgradeCost;
+	}
         /*
          * Constructs a MoneyHut
          * @param world the world which controls it

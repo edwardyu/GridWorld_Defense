@@ -1,3 +1,4 @@
+package td;
 /*
  * TDRunner.java
  * The TDRunner class creates a game and runs it. 
@@ -6,11 +7,7 @@
  * Date: 5/19/13
  * 
  */
-package td;
 
-import info.gridworld.grid.*;
-import info.gridworld.world.*;
-import info.gridworld.actor.*;
 
 import java.util.*;
 
@@ -20,12 +17,12 @@ public class TDRunner
 	{
 		// Hide the tooltips
  		System.setProperty("info.gridworld.gui.tooltips", "hide");
- 			
+		
  		// Include this statement to not highlight a selected cell 		  
  		System.setProperty("info.gridworld.gui.selection", "hide");   	 		    
  			
  		// Set the title for the frame
-		System.setProperty("info.gridworld.gui.frametitle", "Super TD");
+		System.setProperty("info.gridworld.gui.frametitle", "GridDefense by Ronbo and Edward");
 		
 		TDWorld world = new TDWorld();
 		world.show();
@@ -35,6 +32,17 @@ public class TDRunner
 		while(!world.gameOver) {
 			String command = scan.nextLine();
 			command = command.toLowerCase();
+			if(command.contains("output")) {
+				String[] s = command.split(" ");
+				if(s.length > 1) {
+					StringBuilder build = new StringBuilder("");
+					for(int k = 1; k < s.length; k++) {
+						build.append(s[k] + " ");
+					}
+					world.getMenu().output(build.toString());
+					continue;
+				}
+			}
 			switch(command) {
 				case "endgame":
 					//world.end();
@@ -47,7 +55,7 @@ public class TDRunner
 				break;
 				case "addgold":
 					if(world.cheats)
-						world.addGold(100);
+						world.addGold(1000);
 				break;
 				case "barricade":
 				case "firetower":
@@ -63,6 +71,7 @@ public class TDRunner
 				break;
 			}
 		}
+		scan.close();
 		
 	}
 }

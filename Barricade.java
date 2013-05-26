@@ -1,3 +1,4 @@
+package td;
 /*
  * Barricade.java
  * The Barricade class prevents minions from reaching a certain square.  
@@ -7,7 +8,7 @@
  * 
  */
 
-package td;
+
 
 import info.gridworld.actor.*;
 

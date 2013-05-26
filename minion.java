@@ -1,3 +1,4 @@
+package td;
 /*
  * Minion.java
  * The Minion class creates a minion whose job is to get to the end square. 
@@ -8,13 +9,10 @@
  * Date: 5/19/13
  * 
  */
-package td;
+
 
 import info.gridworld.grid.*;
-import info.gridworld.world.*;
 import info.gridworld.actor.*;
-import java.awt.Color;
-
 import java.util.*;
 
 public class Minion extends Actor
@@ -106,6 +104,7 @@ public class Minion extends Actor
             removeSelfFromGrid();
             world.addGold(reward);
             world.printGold();
+            world.killedMinion();
             return;
         }
         
@@ -333,7 +332,6 @@ public class Minion extends Actor
         Location parent = parents.get(end);
         while(!path.contains(start))
         {
-
             path.add(parent);
             parent = parents.get(parent);
         }

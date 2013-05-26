@@ -1,3 +1,4 @@
+package td;
 /*
  * TDWorld.java
  * The TDWorld class creates a grid and manages actors, lives, and attacks. 
@@ -7,39 +8,43 @@
  * Date: 5/19/13
  * 
  */
-package td;
+
 
 import info.gridworld.grid.*;
 import info.gridworld.world.*;
 import info.gridworld.actor.*;
-import info.gridworld.gui.*;
-
 import java.awt.*;
+import java.io.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
+
+import javax.swing.JOptionPane;
 
 
 public class TDWorld extends World<Actor>
 {    
-    private static String DEFAULT_MESSAGE = "Welcome to Super TD!";
+    private static String DEFAULT_MESSAGE = "Welcome to GridDefense!";
     
     public static final boolean DEBUG = false;
     
-    public static boolean cheats = false;
+    public boolean cheats = false;
     
     public final Location startLoc;
     public final Location endLoc;
     
     public static String lastAdded;
     
-    public int hp;
-    public int gold;
+    public int hp = 20;
+    public int gold = 50;
     
     public Actor nextToAdd;
     public boolean gameOver;
+    private boolean gameOverMsg = false;
     
     private boolean gameStarted;
     
@@ -48,6 +53,9 @@ public class TDWorld extends World<Actor>
     private int minionsAdded = 0;
     
     public Graphics2D g2;
+    private Menu menu;
+    
+    private boolean justFinished = false;
     
     private HashSet<Location> open; //list of possible locations to check 
     private HashSet<Location> closed; //list of checked locations
@@ -55,6 +63,10 @@ public class TDWorld extends World<Actor>
     private Map<Location, Integer> gcosts; //distance from beginning to location
     private Map<Location, Integer> hcosts; //distance from end to location
     private Map<Location, Location> parents;
+    
+    private int minionsSlain = 0;
+    
+    private ArrayList<Player> highscores;
     
     /*
      * Easier way to print than System.out.println()
@@ -80,6 +92,14 @@ public class TDWorld extends World<Actor>
         gcosts = new HashMap<Location, Integer>();
         hcosts = new HashMap<Location, Integer>();
         parents = new HashMap<Location, Location>();
+    }
+    
+    public int getWorldHP() {
+    	return hp;
+    }
+    
+    public void killedMinion() {
+    	minionsSlain++;
     }
     
     /*
@@ -123,21 +143,24 @@ public class TDWorld extends World<Actor>
      * Loads the default settings for a game.
      */
     public void load() {
+    	menu = new Menu(this);
+    	menu.show();
     	gameStarted = false;
-    	timer = 10; //game starts in 10 steps
+    	timer = 1; //game starts in 10 steps
         level = 1;
     	gameOver = false;
-    	gold = 50;
-    	hp = 20;
     	add(startLoc, new Shade(this));
     	add(endLoc, new Shade(this));
+    	highscores = loadHighscores();
+    	System.out.println("highscores: " + highscores);
     }
     
     /*
      * Enables cheat mode, where objects can be added to the grid without retyping the type every time. 
      */
-    public void cheater() {
+    public boolean cheater() {
     	cheats = !cheats;
+    	return cheats;
     }
     
     /*
@@ -146,6 +169,7 @@ public class TDWorld extends World<Actor>
      */
     public void takeGold(int toTake) {
     	gold -= toTake;
+    	menu.updateGold();
     }
     
     /*
@@ -154,6 +178,7 @@ public class TDWorld extends World<Actor>
      */
     public void addGold(int toAdd) {
     	gold += toAdd;
+    	menu.updateGold();
     }
     
     /*
@@ -179,10 +204,10 @@ public class TDWorld extends World<Actor>
      */
     public void loseLife() {
     	hp--;
+    	menu.updateHP();
     	System.out.println("You have lost a life! You now have " + hp + " lives.");
     	if(hp == 0) {
     		gameOver = true;
-    		System.out.println("GAME OVER! You lost!");
     	}
     }
     
@@ -269,9 +294,58 @@ public class TDWorld extends World<Actor>
     {
         if(getGrid().get(loc) instanceof Barricade)
         {
-            gold += ((Barricade) getGrid().get(loc)).getCost();
-            remove(loc);
-            printGold();
+        	if(getGrid().get(loc) instanceof BasicTower) {
+        		BasicTower tower = (BasicTower)(getGrid().get(loc));
+        		if(tower.getLevel() < 3) {
+		        	String[] options = { "Upgrade (" + tower.getUpgradeCost()[tower.getLevel() - 1] + "g)", "Remove (70% refund)", "Info" };
+		        	Object choice = null;
+		        	choice = JOptionPane.showInputDialog(null, "Action?", "Input", JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		        	if(choice == null)
+		        		return true;
+		        	if(choice.toString().contains("Upgrade")) {
+		        		if(gold >= tower.getUpgradeCost()[tower.getLevel() - 1]) {
+		        			gold -= tower.getUpgradeCost()[tower.getLevel() - 1];
+		        			tower.levelUp();
+		        			System.out.println("Congratulations, your structure is now level " + tower.getLevel() + "!");
+		        			menu.updateGold();
+		        			printGold();
+		        		} else {
+		        			System.out.println("Sorry, but you need " + tower.getUpgradeCost()[tower.getLevel() - 1] + " gold to upgrade this structure.");
+		        		}
+		        	} else if (choice.toString().contains("Remove")) {
+		        		remove(loc);
+		        		int toRefund;
+		        		if(tower.getLevel() == 1)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost()));
+		        		else
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[tower.getLevel() - 2]));
+		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
+		        		gold += toRefund;
+		        		menu.updateGold();
+		        	} else if (choice.toString().contains("Info")) {
+		        		System.out.println("This tower is level " + tower.getLevel() +".");
+		        	}
+        		} else {
+        			String[] options = { "Remove (70% refund)", "Info" };
+		        	Object choice = null;
+		        	choice = JOptionPane.showInputDialog(null, "Action?", "Input", JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+		        	if(choice == null)
+		        		return true;
+		        	if (choice.toString().contains("Remove")) {
+		        		remove(loc);
+		        		int toRefund;
+		        		if(tower.getLevel() == 1)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost()));
+		        		else
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[tower.getLevel() - 2]));
+		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
+		        		gold += toRefund;
+		        		menu.updateGold();
+		        	} else if (choice.toString().contains("Info")) {
+		        		System.out.println("This tower is level " + tower.getLevel() +".");
+		        	}
+        		}
+        	}
         }
         
     	if(nextToAdd == null)
@@ -285,6 +359,7 @@ public class TDWorld extends World<Actor>
         if(!(nextToAdd instanceof Minion) && ((Barricade)nextToAdd).getCost() <= gold) 
         {
         	gold -= ((Barricade)nextToAdd).getCost();
+        	menu.updateGold();
 	        System.out.println("You now have " + gold + " gold."); 
 	    	add(loc, nextToAdd);
         } 
@@ -319,7 +394,76 @@ public class TDWorld extends World<Actor>
        System.out.println("The speed of each step may be adjusted in the Run Speed slider below.");
        printGold();
     }
-
+    
+    public ArrayList<Player> loadHighscores() {
+    	ArrayList<Player> ar = new ArrayList<Player>();
+    	try {
+        	Scanner scan = new Scanner(new File("highscores.dat"));
+    		while(scan.hasNextLine()) {
+    			String data = scan.nextLine();
+    			ar.add(new Player(data.substring(0, data.indexOf("::")), Integer.parseInt(data.substring(data.indexOf("::") + 2))));
+    		}
+    		scan.close();
+    	} catch (IOException e) {
+    		System.out.println("Highscores data not found. Creating new highscores file.");
+    		File hs = new File("highscores.dat");
+    		try {
+				hs.createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	} finally {
+    	}
+    	Collections.sort(ar);
+    	return ar;
+    }
+    
+    public Menu getMenu() {
+    	return menu;
+    }
+    
+    public ArrayList<Player> getHighscores() {
+    	return highscores;
+    }
+	
+    public void updateHighscores() {
+    	String playerName = "";
+    	while(playerName.equals(""))
+    		playerName = JOptionPane.showInputDialog("Name?");
+    	boolean largest = true;
+    	for(Player p : highscores) {
+    		if(p.getName().equalsIgnoreCase(playerName)) {
+    			if(p.getScore() < minionsSlain) {
+    				highscores.remove(p);
+    			} else {
+    				largest = false;
+    			}
+    		}
+    	}
+    	if(largest) {
+    		Player me = new Player(playerName, minionsSlain);
+    		highscores.add(me);
+    		Collections.sort(highscores);
+    		System.out.println("Congratulations, you ranked " + (highscores.indexOf(me) + 1) + " on the highscores!");
+    		writeHighscores();
+    	}
+    }
+    
+    public void writeHighscores() {
+    	try {
+			PrintWriter out = new PrintWriter(new File("highscores.dat"));
+			for(Player p : highscores) {
+				out.println(p.getName() + "::" + p.getScore());
+			}
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+    	
+    }
+    
     /*
      * Makes each actor in the world act. Towers and barricades are processed first, then minions.
      */
@@ -333,7 +477,11 @@ public class TDWorld extends World<Actor>
     		return;
     	}
     	if(gameOver) {
-    		System.out.println("Game over. Please reload Super TD to start a new game.");
+    		if(!gameOverMsg) {
+    			System.out.println("Game over. Please reload GridDefense to start a new game.");
+    			gameOverMsg = true;
+    			updateHighscores();
+    		}
     		return;
     	}
         Grid<Actor> gr = getGrid();
@@ -341,7 +489,7 @@ public class TDWorld extends World<Actor>
         for (Location loc : gr.getOccupiedLocations())
             minions.add(gr.get(loc));
 		
-		ArrayList<Actor> towers = (ArrayList<Actor>)minions.clone();
+        ArrayList<Actor> towers = (ArrayList<Actor>)minions.clone();
         for (Actor a : towers)
         {
             if (a.getGrid() == gr && a instanceof Barricade)
@@ -371,6 +519,7 @@ public class TDWorld extends World<Actor>
         }
         if(allDead) {
         	gold += getGoldBonus();
+        	menu.updateGold();
         	timer = 10;
         	level++;
         	minionsAdded = 0;
@@ -379,9 +528,18 @@ public class TDWorld extends World<Actor>
                 System.out.println("Minion health: " + level * level * 2);
                 
                 printGold();
+            justFinished = true;
         }
     }
 
+    public boolean justFinished() {
+    	return justFinished;
+    }
+    
+    public void readyNextWave() {
+    	justFinished = false;
+    }
+    
     /*
      * Adds an actor to the grid
      * @param loc the location which the actor will be added to

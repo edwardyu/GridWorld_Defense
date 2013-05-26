@@ -1,3 +1,4 @@
+package td;
 /*
  * MageTower.java
  * A MageTower damages all minions adjacent to it, usually killing it instantly.
@@ -6,10 +7,9 @@
  * Date: 5/19/13
  * 
  */
-package td;
+
 
 import info.gridworld.actor.*;
-import info.gridworld.world.*;
 import info.gridworld.grid.*;
 import java.util.ArrayList;
 
@@ -23,15 +23,24 @@ public class MageTower extends BasicTower implements GameComponent{
 	private int level = 1;
 
 	private int timer;
-        
+    public int getLevel() {
+    	return level;
+    }
+    public void levelUp() {
+    	level++;
+    }
     /*
      * Gets the amount of money needed to build a MageTower
      * @return amount of money needed to build a MageTower
      */
+
 	public int getCost() {
 		return COST;
 	}
 	
+	public int[] getUpgradeCost() {
+		return upgradeCost;
+	}
     /*
      * Constructs a MageTower
      * @param world the world which controls the tower

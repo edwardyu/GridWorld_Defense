@@ -1,3 +1,4 @@
+package td;
 /*
  * WaterTower.java
  * A WaterTower damages all minions in all cardinal directions. It is blocked by barricades and other towers.
@@ -6,10 +7,8 @@
  * Date: 5/19/13
  * 
  */ 
-package td;
 
-import info.gridworld.actor.*;
-import info.gridworld.world.*;
+
 import info.gridworld.grid.*;
 import java.util.ArrayList;
 
@@ -22,15 +21,24 @@ public class WaterTower extends BasicTower implements GameComponent
 	private static int[] speed = {5, 3, 1};
         private int level = 1;
         private int timer;
-
+        public int getLevel() {
+        	return level;
+        }
+        public void levelUp() {
+        	level++;
+        }
         /*
          * Gets the amount of money needed to build a MoneyHut
          * @return amount of money needed to build a MoneyHut
          */
-        public int getCost() 
-        {
-            return COST;
-        }
+
+    	public int getCost() {
+    		return COST;
+    	}
+    	
+    	public int[] getUpgradeCost() {
+    		return upgradeCost;
+    	}
         
     /*
      * Constructs a MageTower

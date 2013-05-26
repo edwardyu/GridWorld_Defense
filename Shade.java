@@ -1,3 +1,4 @@
+package td;
 /*
  * Shade.java
  * A Shade colors a square, and is used to mark the start and end locations.
@@ -6,7 +7,7 @@
  * Date: 5/19/13
  * 
  */
-package td;
+
 
 import info.gridworld.actor.*;
 
