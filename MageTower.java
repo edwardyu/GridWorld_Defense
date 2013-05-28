@@ -16,19 +16,49 @@ import java.util.ArrayList;
 public class MageTower extends BasicTower implements GameComponent{
 	
 	private static final int COST = 1000;
-	private static final int[] upgradeCost = {150, 300, 600};
-	private static final int[] damage = {100, 200, 300};
+	private static final int[] upgradeCost = {300, 600};
+	private static final int[] damage = {100, 200, 350};
 	private static final int[] speed = {7, 6, 5};	
 
 	private int level = 1;
 
 	private int timer;
+	
+	/*
+	 * Gets the level of the structure
+	 * @return current level of the structure, from 1 to 3
+	 */
+	
     public int getLevel() {
     	return level;
     }
+    
+    /*
+     * Levels up the structure
+     */
+    
     public void levelUp() {
     	level++;
-    }
+    }	
+    
+    /*
+     * Modifies the name of the .gif that represents this tower
+     * according to what levels it is
+     * @return the suffix of the image
+     */
+    
+    public String getImageSuffix() { 
+		if (level == 1) {
+			return "";
+		}
+		else if (level == 2) {
+			return "_2";
+		}
+		else {
+			return "_3"; 
+		}
+	} 
+    
     /*
      * Gets the amount of money needed to build a MageTower
      * @return amount of money needed to build a MageTower
@@ -37,6 +67,11 @@ public class MageTower extends BasicTower implements GameComponent{
 	public int getCost() {
 		return COST;
 	}
+	
+	/*
+	 * Gets the upgrade-cost array for this structure
+	 * @return an int[] containing two values for the tower upgrades from levels 1-2 and 2-3
+	 */
 	
 	public int[] getUpgradeCost() {
 		return upgradeCost;

@@ -30,31 +30,32 @@ public class TDWorld extends World<Actor>
 {    
     private static String DEFAULT_MESSAGE = "Welcome to GridDefense!";
     
-    public static final boolean DEBUG = false;
+    private static final boolean DEBUG = false;
     
-    public boolean cheats = false;
+    private boolean cheats = false;
     
-    public final Location startLoc;
-    public final Location endLoc;
+    private final Location startLoc;
+    private final Location endLoc;
     
-    public static String lastAdded;
+    private static String lastAdded;
     
-    public int hp = 20;
-    public int gold = 50;
+    private int hp = 20;
+    private int gold = 50;
     
-    public Actor nextToAdd;
-    public boolean gameOver;
+    private Actor nextToAdd;
+    private boolean gameOver;
     private boolean gameOverMsg = false;
     
     private boolean gameStarted;
     
+    private int minionsLeft = 0;
     private int timer;
     private int level = 1;
     private int minionsAdded = 0;
     
     private boolean autorun = true;
     
-    public Graphics2D g2;
+    private Graphics2D g2;
     private Menu menu;
     
     private boolean justFinished = false;
@@ -96,12 +97,63 @@ public class TDWorld extends World<Actor>
         parents = new HashMap<Location, Location>();
     }
     
+    /*
+     * Gets the current wave that the player is on
+     * @return current wave number
+     */
+    public int getWave() {
+    	return level;
+    }
+    /*
+     * Gets the number of lives left that the player has
+     * @return number of remaining lives
+     */
     public int getWorldHP() {
     	return hp;
     }
-    
+    /*
+     * Checks to see if cheat-mode has been activate
+     * @return is cheat-mode active?
+     */
+    public boolean isCheating() {
+    	return cheats;
+    }
+    /*
+     * Checks to see if the game is over (0 lives left)
+     * @return is the game over?
+     */
+    public boolean gameOver() {
+    	return gameOver;
+    }
+    /*
+     * Returns the number of minions left in the wave
+     * @return the number of minions left in the wave
+     */
+    public int getMinionsLeft() {
+    	return minionsLeft;
+    }
+    /*
+     * Returns the number of minions slain
+     * @return number of minions slain
+     */
+    public int getMinionsSlain() {
+    	return minionsSlain;
+    }
+    /*
+     * Adds a given number of lives to the world - currently only used in cheat-mode 
+     * @param number of lives to add
+     */
+    public void addLives(int toAdd) {
+    	hp += toAdd;
+    	menu.updateHP();
+    }
+    /*
+     * Indicates that a minion has been slain and updates accordingly
+     */
     public void killedMinion() {
     	minionsSlain++;
+    	minionsLeft--;
+    	menu.minionsLeft();
     }
     
     /*
@@ -285,7 +337,13 @@ public class TDWorld extends World<Actor>
             setMessage(DEFAULT_MESSAGE);
         super.show();
     }    
-    	
+    
+    /*
+     * Toggles the state of the auto-run system
+     * which decides whether or not there will be
+     * automatic pauses between waves
+     * @param state of the autorun system
+     */
     public void setAutorun(boolean r) {
     	autorun = r;
     }
@@ -302,6 +360,10 @@ public class TDWorld extends World<Actor>
     {
         if(getGrid().get(loc) instanceof Barricade)
         {
+        	/*
+        	 * Sub-menu for towers
+        	 * Upgrade, Remove (for a refund), and check level (though that should be obvious from the images)
+        	 */
         	if(getGrid().get(loc) instanceof BasicTower) {
         		BasicTower tower = (BasicTower)(getGrid().get(loc));
         		if(tower.getLevel() < 3) {
@@ -318,11 +380,13 @@ public class TDWorld extends World<Actor>
 		        			System.out.println("You spent " + tower.getUpgradeCost()[tower.getLevel() - 2] + " to upgrade your turret. You now have " + gold + " gold.");
 		        	} else if (choice.toString().contains("Remove")) {
 		        		remove(loc);
-		        		int toRefund;
+		        		int toRefund = 0;
 		        		if(tower.getLevel() == 1)
 		        			toRefund = (int) (0.7 * (double)(tower.getCost()));
-		        		else
-		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[tower.getLevel() - 2]));
+		        		else if(tower.getLevel() == 2)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[0]));
+		        		else if(tower.getLevel() == 2)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[0] + tower.getUpgradeCost()[1]));
 		        		gold += toRefund;
 		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
 		        		menu.updateGold();
@@ -330,7 +394,7 @@ public class TDWorld extends World<Actor>
 		        		JOptionPane.showMessageDialog(null,"This tower is level " + tower.getLevel() + ".","Tower Info",JOptionPane.PLAIN_MESSAGE);
 		        		System.out.println("This tower is level " + tower.getLevel() +".");
 		        	}
-        		} else {
+        		} else { //level 3 turrets should not have the option to upgrade as they are already at max level
         			String[] options = { "Remove (70% refund)", "Info" };
 		        	Object choice = null;
 		        	choice = JOptionPane.showInputDialog(null, "Action?", "Input", JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
@@ -338,19 +402,39 @@ public class TDWorld extends World<Actor>
 		        		return true;
 		        	if (choice.toString().contains("Remove")) {
 		        		remove(loc);
-		        		int toRefund;
+		        		int toRefund = 0;
 		        		if(tower.getLevel() == 1)
 		        			toRefund = (int) (0.7 * (double)(tower.getCost()));
-		        		else
-		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[tower.getLevel() - 2]));
-		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
+		        		else if(tower.getLevel() == 2)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[0]));
+		        		else if(tower.getLevel() == 2)
+		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[0] + tower.getUpgradeCost()[1]));
 		        		gold += toRefund;
+		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
 		        		menu.updateGold();
 		        	} else if (choice.toString().contains("Info")) {
+		        		JOptionPane.showMessageDialog(null,"This tower is level " + tower.getLevel() + ".","Tower Info",JOptionPane.PLAIN_MESSAGE);
 		        		System.out.println("This tower is level " + tower.getLevel() +".");
 		        	}
         		}
         	}
+        	/*
+        	 * Barricades may only be refunded for 4g - there are no other options
+        	 */
+        	if(getGrid().get(loc) instanceof Barricade && !(getGrid().get(loc) instanceof BasicTower)) {
+        		String[] options = { "Remove (4g refund)"};
+	        	Object choice = null;
+	        	choice = JOptionPane.showInputDialog(null, "Action?", "Input", JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+	        	if(choice == null)
+		        	return true;
+	        	if(choice.toString().contains("Remove")) {
+	        		remove(loc);
+	        		gold += 4;
+	        		System.out.println("You have been refunded 4 gold. You now have " + gold + " gold.");
+	        		menu.updateGold();
+	        	}
+        	}
+        	return true;
         }
         
         if(getGrid().get(loc) != null)
@@ -358,6 +442,10 @@ public class TDWorld extends World<Actor>
         
     	if(nextToAdd == null)
     		return true;
+    	
+    	/*
+    	 * Minions must always have a path to the end
+    	 */
         if(!isValidPlacement(loc))
         {
             System.out.println("Sorry, you can't place objects to completely block the end path.");
@@ -380,7 +468,6 @@ public class TDWorld extends World<Actor>
         {
         	System.out.println("Sorry, but you must have " + ((Barricade)nextToAdd).getCost() + " gold to build this structure!");
         }
-        //nextToAdd.putSelfInGrid(getGrid(), loc);
         
     	if(!cheats) {
     		nextToAdd = null;
@@ -399,9 +486,16 @@ public class TDWorld extends World<Actor>
        System.out.println("Welcome to GridDefense!");
        System.out.println("Wave 1 will begin when you press Run.");
        System.out.println("The speed of each step may be adjusted in the Run Speed slider below.");
+       minionsLeft = 2;
+       menu.updateWaveInfo();
        printGold();
     }
     
+    /*
+     * Loads the highscores.dat file and returns the loaded data in an ArrayList of Player objects
+     * Player objects store a name and score
+     * @return ArrayList of players in the highscores
+     */
     public ArrayList<Player> loadHighscores() {
     	ArrayList<Player> ar = new ArrayList<Player>();
     	try {
@@ -427,14 +521,26 @@ public class TDWorld extends World<Actor>
     	return ar;
     }
     
+    /*
+     * Gets the game menu
+     * @return menu
+     */
     public Menu getMenu() {
     	return menu;
     }
     
+    /*
+     * Gets the highscores ArrayList for external use
+     * @return highscores arraylist of Players
+     */
     public ArrayList<Player> getHighscores() {
     	return highscores;
     }
 	
+    /*
+     * Updates highscores by prompting the player for a name and recording the player's
+     * score in the highscores arraylist, then writing the arraylist to the highscores.dat file
+     */
     public void updateHighscores() {
     	String playerName = null;
     	while(playerName == null)
@@ -457,7 +563,9 @@ public class TDWorld extends World<Actor>
     		writeHighscores();
     	}
     }
-    
+    /*
+     * Writes the current highscores ArrayList to the highscores.dat file 
+     */
     public void writeHighscores() {
     	try {
     		Collections.sort(highscores);
@@ -523,12 +631,12 @@ public class TDWorld extends World<Actor>
         boolean allDead = true;
         for(Location loc : gr.getOccupiedLocations()) {
         	if(gr.get(loc) instanceof Minion)
-        		allDead = false; 
+        		allDead = false;
         }
-        if(allDead) {
+        if(allDead) { //Wave is over as all minions in it have been slain
         	gold += getGoldBonus();
         	menu.updateGold();
-        	timer = 10;
+        	timer = 5;
         	level++;
         	minionsAdded = 0;
         	if(autorun) {
@@ -537,15 +645,24 @@ public class TDWorld extends World<Actor>
         	}
         	System.out.println("Info on wave " + level);
             System.out.println("Minions: " + 2 * level);
-            System.out.println("Minion health: " + level * level * 2);   
+            minionsLeft = 2 * level;
+            System.out.println("Minion health: " + level * level * 2); 
+            menu.updateWaveInfo();
             printGold();
         }
     }
 
+    /*
+     * Checks whether a wave was just completed
+     * @return was the wave just finished
+     */
     public boolean justFinished() {
     	return justFinished;
     }
     
+    /*
+     * Indicates that the next wave can now be spawned on the next step of the world
+     */
     public void readyNextWave() {
     	justFinished = false;
     }

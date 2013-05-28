@@ -15,7 +15,7 @@ import java.util.*;
 public class BasicTower extends Barricade implements GameComponent{
 	
     private static final int COST = 10;
-    private static final int[] upgradeCost = {25, 50, 100};	
+    private static final int[] upgradeCost = {25, 50};	
     private static int[] damageAmount = {10, 20, 30};
     private static int[] speed = {3, 2, 1};
 
@@ -23,15 +23,30 @@ public class BasicTower extends Barricade implements GameComponent{
 
     private int timer;
     
+	/*
+	 * Gets the level of the structure
+	 * @return current level of the structure, from 1 to 3
+	 */
+	
     public int getLevel() {
     	return level;
     }
     
+    /*
+     * Levels up the structure
+     */
+    
     public void levelUp() {
     	level++;
-    }
+    }	
     
-	public String getImageSuffix() { 
+    /*
+     * Modifies the name of the .gif that represents this tower
+     * according to what levels it is
+     * @return the suffix of the image
+     */
+    
+    public String getImageSuffix() { 
 		if (level == 1) {
 			return "";
 		}
@@ -52,14 +67,19 @@ public class BasicTower extends Barricade implements GameComponent{
 		return COST;
 	}
 	
+	/*
+	 * Gets the upgrade-cost array for this structure
+	 * @return an int[] containing two values for the tower upgrades from levels 1-2 and 2-3
+	 */
+	
 	public int[] getUpgradeCost() {
 		return upgradeCost;
 	}
 	
-/*
- * Constructs a BasicTower
- * @param world the world which controls the tower
- */	
+	/*
+	 * Constructs a BasicTower
+	 * @param world the world which controls the tower
+	 */	
     public BasicTower(TDWorld world) {
             super(world);
             setColor(null);
@@ -95,9 +115,9 @@ public class BasicTower extends Barricade implements GameComponent{
             m.get((int)(Math.random() * m.size())).damage(damageAmount[level - 1]);
     }
     
-/*
- * Upgrade a BasicTower to the next level. This will increase its damage, speed, and cost.
- */
+	/*
+	 * Upgrade a BasicTower to the next level. This will increase its damage, speed, and cost.
+	 */
     public void upgrade() {
             if(getWorld().getGold() >= upgradeCost[level - 1]) {
                     getWorld().takeGold(upgradeCost[level - 1]);

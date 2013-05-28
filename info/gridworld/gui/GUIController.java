@@ -20,7 +20,6 @@ package info.gridworld.gui;
 
 import td.*;
 
-import info.gridworld.actor.Actor;
 import info.gridworld.grid.*;
 import info.gridworld.world.World;
 
@@ -28,6 +27,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Modifier;
@@ -40,6 +41,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.*;
 
+/* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ * @  NOTE: Please use the find function and search for       @
+ * @  "GridDefense" to see what code segments were modified   @
+ * @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ */
 /**
  * The GUIController controls the behavior in a WorldFrame. <br />
  * This code is not tested on the AP CS A and AB exams. It contains GUI
@@ -52,11 +58,16 @@ public class GUIController<T>
     public static final int INDEFINITE = 0, FIXED_STEPS = 1, PROMPT_STEPS = 2;
 
     private static final int MIN_DELAY_MSECS = 10, MAX_DELAY_MSECS = 1000;
-    private static final int INITIAL_DELAY = MIN_DELAY_MSECS
-            + (MAX_DELAY_MSECS - MIN_DELAY_MSECS) / 2;
+    
+    /* GridDefense
+     * Set INITIAL_DELAY to a static 500 ms. It cannot be adjusted
+     * as the speed silder was removed
+     */
+    private static final int INITIAL_DELAY = 500;
 
     private Timer timer;
     private JButton stepButton, runButton, stopButton;
+    private JCheckBox autorun;
     private JComponent controlPanel;
     private GridPanel display;
     private WorldFrame<T> parentFrame;
@@ -119,7 +130,7 @@ public class GUIController<T>
             {
                 Grid<T> gr = parentFrame.getWorld().getGrid();
                 Location loc = display.locationForPoint(evt.getPoint());
-                /* Ronbo
+                /* GridDefense
                  * removed isRunning() check so that structures 
                  * can be placed while the game is running
                  */
@@ -127,6 +138,8 @@ public class GUIController<T>
                 {
                     display.setCurrentLocation(loc);
                     locationClicked();
+
+                    parentFrame.repaint();
                 }
             }
         });
@@ -134,8 +147,8 @@ public class GUIController<T>
     }
 
     
-    /* Ronbo
-     * If a wave was just finished, will stop running.
+    /* GridDefense
+     * If a wave was just finished, the auto-run will stop running.
      */
     
     /**
@@ -178,7 +191,6 @@ public class GUIController<T>
      */
     public void run()
     {
-    	System.out.println("oh hello");
         display.setToolTipsEnabled(false); // hide tool tips while running
         parentFrame.setRunMenuItemsEnabled(false);
         stopButton.setEnabled(true);
@@ -207,19 +219,50 @@ public class GUIController<T>
     {
         return running;
     }
+    /*
+     * GridDefense
+     * Listener for checkbox to see if the world should automatically
+     * pause between waves
+     */
+    public class Autorun implements ItemListener{
 
+        public void itemStateChanged(ItemEvent e) {
+            Object source = e.getItemSelectable();
+
+            if (source == autorun) {
+            	System.out.println("current checkbox status: " + autorun.isSelected());
+
+            	((TDWorld)parentFrame.getWorld()).setAutorun(autorun.isSelected());
+            }
+
+        }
+    }
+    
     /**
      * Builds the panel with the various controls (buttons and
      * slider).
      */
     private void makeControls()
     {
+    	/*
+    	 * GridDefense
+    	 * Renamed Run and Stop buttons
+    	 */
         controlPanel = new JPanel();
         stepButton = new JButton(resources.getString("button.gui.step"));
         //runButton = new JButton(resources.getString("button.gui.run"));
         runButton = new JButton("Start Wave");
         //stopButton = new JButton(resources.getString("button.gui.stop"));
         stopButton = new JButton("Pause");
+        
+        /*
+         * GridDefense
+         * Added new checkbox to toggle whether the game automatically
+         * pauses between waves
+         */
+        autorun = new JCheckBox("Pause Between Waves");
+        autorun.setSelected(true);
+        autorun.addItemListener(new Autorun());
         
         controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
         controlPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -229,7 +272,7 @@ public class GUIController<T>
         controlPanel.add(Box.createRigidArea(spacer));
 
         /*
-         * Ronbo
+         * GridDefense
          * remove step button from displaying - it will not be used.
          */
         //controlPanel.add(stepButton);
@@ -242,7 +285,7 @@ public class GUIController<T>
         stopButton.setEnabled(false);
 
         controlPanel.add(Box.createRigidArea(spacer));
-        controlPanel.add(new JLabel(resources.getString("slider.gui.slow")));
+        //controlPanel.add(new JLabel(resources.getString("slider.gui.slow")));
         JSlider speedSlider = new JSlider(MIN_DELAY_MSECS, MAX_DELAY_MSECS,
                 INITIAL_DELAY);
         speedSlider.setInverted(true);
@@ -260,16 +303,20 @@ public class GUIController<T>
             map = map.getParent();
         }
 
-        controlPanel.add(speedSlider);
-        controlPanel.add(new JLabel(resources.getString("slider.gui.fast")));
+        /* GridDefense
+         * speed of the game may not be changed; slider has been removed
+         */
+        //controlPanel.add(speedSlider);
+        //controlPanel.add(new JLabel(resources.getString("slider.gui.fast")));
+        controlPanel.add(autorun);
         controlPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 
         stepButton.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-            	/* Ronbo
-            	 * "Step" button disabled
+            	/* GridDefense
+            	 * "Step" button disabled 
             	 */
                 //step();
             }

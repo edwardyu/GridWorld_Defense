@@ -5,7 +5,6 @@ package td;
  * @author Edward Yu, Ronbo Fan
  * Period: 6
  * Date: 5/19/13
- * 
  */
 
 
@@ -19,10 +18,10 @@ public class Barricade extends Actor implements GameComponent
     private TDWorld world;
 
 
-/*
- * Constructs a barricade, which blocks objects from going through it
- * @param world the world in which the barricade will be placed.
- */
+	/*
+	 * Constructs a barricade, which blocks objects from going through it
+	 * @param world the world in which the barricade will be placed.
+	 */
     public Barricade(TDWorld world) 
     {
             this.world = world;
@@ -46,10 +45,10 @@ public class Barricade extends Actor implements GameComponent
 
     }
     
- /*
-  * Gets the world the barricade is in
-  * @return world
-  */       
+	/*
+	 * Gets the world the barricade is in
+	 * @return world
+	 */       
     public TDWorld getWorld()
     {
             return world;

@@ -29,24 +29,14 @@ public class TDRunner
 		
 		Scanner scan = new Scanner(System.in);
 		world.instructions();
-		while(!world.gameOver) {
+		/*
+		 * These commands were intended for player use but were replaced
+		 * by the Menu. They are no longer useful except for debugging purposes (cheats)
+		 */
+		while(!world.gameOver()) {
 			String command = scan.nextLine();
 			command = command.toLowerCase();
-			if(command.contains("output")) {
-				String[] s = command.split(" ");
-				if(s.length > 1) {
-					StringBuilder build = new StringBuilder("");
-					for(int k = 1; k < s.length; k++) {
-						build.append(s[k] + " ");
-					}
-					world.getMenu().output(build.toString());
-					continue;
-				}
-			}
 			switch(command) {
-				case "endgame":
-					//world.end();
-				break;
 				case "ronboswag":
 					world.cheater();
 				break;
@@ -54,9 +44,15 @@ public class TDRunner
 					System.out.println(world.getGold());
 				break;
 				case "addgold":
-					if(world.cheats) {
+					if(world.isCheating()) {
 						System.out.println("cheat code for 10k gold activated");
 						world.addGold(10000);
+					}
+				break;
+				case "addlives":
+					if(world.isCheating()) {
+						System.out.println("cheat code for 20 extra lives activated");
+						world.addLives(20);
 					}
 				break;
 				case "barricade":

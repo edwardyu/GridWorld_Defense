@@ -25,7 +25,6 @@ public class Minion extends Actor
 	private Location start; //the start location for the minion
 	private Location end;  //the target location
 	private int health;    //how much health the minion has
-	private int[] fireTicks; //{dps, time}
         private int reward; //money gained from killing a minion
 
         
@@ -40,6 +39,12 @@ public class Minion extends Actor
 	
 	private TDWorld world;
 	
+	/*
+	 * Constructs a minion with specified start and end locations and TDWorld
+	 * @param start the start location of the minion
+	 * @param end the destination of the minion
+	 * @param world the world in which the minion has been placed
+	 */
     public Minion(Location start, Location end, TDWorld world) {
     	myID = ID;
     	ID++;
@@ -56,7 +61,6 @@ public class Minion extends Actor
         hcosts = new HashMap<Location, Integer>();
         parents = new HashMap<Location, Location>();
     	setColor(null);
-    	//System.out.println("open size: " + open.size() + "\n" + open);
     }
     
     /*
@@ -93,7 +97,6 @@ public class Minion extends Actor
      */
     public void act()
     {
-        //setColor(null);
         start = getLocation();
         Location nextMove = getNextMove();
         
@@ -124,7 +127,6 @@ public class Minion extends Actor
         }
         
         //reset everything
-//        start = getLocation();
         open = new HashSet<Location>();
         closed = new HashSet<Location>();
         fcosts = new HashMap<Location, Integer>();
@@ -134,26 +136,12 @@ public class Minion extends Actor
     }
     
     /*
-     * Inflicts fire damage on the minion, which may last for several turns
-     * @param fireDamage array containing [damage per step, amount of time damage is done]
-     */
-    public void applyFire(int[] fireDamage) {
-    	fireTicks = fireDamage;
-    }
-    
-    /*
      * Removes some health from the minion
      * @param amount the amount of health to be deducted
      */
     public void damage(int amount)
     {
     	health -= amount;
-        //System.out.println("Health of Minion " + myID +": " + health);
-        
-        /*
-        if(health <= 0)
-            removeSelfFromGrid();
-        */
     }
     
     /*
