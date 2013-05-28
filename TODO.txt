@@ -1,4 +1,3 @@
-*add ability to remove barricades for a refund
 *tutorial
 *comment new files
 *firetower, watertower, magetower, moneyhut pictures not updating when upgrading
