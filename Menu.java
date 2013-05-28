@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Menu {
 	
     private JFrame frame = new JFrame("GridDefense");
+    private JPanel barrPanel = new JPanel();
     private JPanel basicPanel = new JPanel();
     private JPanel waterPanel = new JPanel();
     private JPanel firePanel = new JPanel();
@@ -17,6 +18,7 @@ public class Menu {
     private JPanel consecPanel = new JPanel(); //Place consecutively
     private JPanel hsPanel = new JPanel();
 
+    private JButton barrBtn = new JButton("Barricade (5g)");
     private JButton basicBtn = new JButton("Basic Tower (10g)");
     private JButton waterBtn = new JButton("Water Tower (50g)");
     private JButton fireBtn = new JButton("Fire Tower (100g)");
@@ -44,7 +46,8 @@ public class Menu {
         mnuHelp.add(instructions); 
         mb.add(mnuHelp);
         frame.getContentPane().setLayout(new GridLayout(20,1,0,0));
-        
+
+		frame.getContentPane().add(barrPanel);
 		frame.getContentPane().add(basicPanel);
 		frame.getContentPane().add(waterPanel);
 		frame.getContentPane().add(firePanel);
@@ -53,7 +56,10 @@ public class Menu {
 		frame.getContentPane().add(consecPanel);
 		frame.getContentPane().add(hsPanel);
         frame.addWindowListener(new Close());
-        
+
+        barrPanel.add(barrBtn);
+		barrBtn.addActionListener(new ListenBarr());
+		
         basicPanel.add(basicBtn);
 		basicBtn.addActionListener(new ListenBasic());
 		
@@ -120,6 +126,12 @@ public class Menu {
         	System.out.println("hi there this isn't done");
         }
     }
+	
+	public class ListenBarr implements ActionListener{
+	    public void actionPerformed(ActionEvent e){
+	        world.nextType("barricade");  
+	    }
+	}
     	
     public class ListenBasic implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -163,12 +175,19 @@ public class Menu {
             JFrame hsf = new JFrame("Highscores");
         	ArrayList<Player> hs = world.getHighscores();
             hsf.getContentPane().setLayout(new GridLayout(10,2,0,0));
-        	for(int k = 0; k < hs.size() && k < 20; k++) {
-        		JLabel next = new JLabel(k + 1 + ". " + hs.get(k).getName() + " - " + hs.get(k).getScore());
-        		next.setFont(new Font("Serif", Font.PLAIN, 12));
+        	for(int k = 0; k < 20; k++) {
+        		JLabel next;
+        		if(k >= hs.size()) {
+        			next = new JLabel(k + 1 + ". SPOT UNOCCUPIED");
+            		next.setFont(new Font("Serif", Font.PLAIN, 15));
+        			hsf.add(next);
+        			continue;
+        		}
+        		next = new JLabel(k + 1 + ". " + hs.get(k).getName() + " - " + hs.get(k).getScore());
+        		next.setFont(new Font("Serif", Font.PLAIN, 15));
         		hsf.add(next);
         	}
-            hsf.setSize(300,800);
+            hsf.setSize(600,400);
             hsf.setLocation(900, 10);
             hsf.setResizable(false);
             hsf.setVisible(true);

@@ -52,6 +52,8 @@ public class TDWorld extends World<Actor>
     private int level = 1;
     private int minionsAdded = 0;
     
+    private boolean autorun = true;
+    
     public Graphics2D g2;
     private Menu menu;
     
@@ -146,7 +148,7 @@ public class TDWorld extends World<Actor>
     	menu = new Menu(this);
     	menu.show();
     	gameStarted = false;
-    	timer = 1; //game starts in 10 steps
+    	timer = 10; //game starts in 10 steps
         level = 1;
     	gameOver = false;
     	add(startLoc, new Shade(this));
@@ -160,6 +162,7 @@ public class TDWorld extends World<Actor>
      */
     public boolean cheater() {
     	cheats = !cheats;
+    	System.out.println("Cheat-mode " + (cheats ? "enabled." : "disabled."));
     	return cheats;
     }
     
@@ -208,6 +211,7 @@ public class TDWorld extends World<Actor>
     	System.out.println("You have lost a life! You now have " + hp + " lives.");
     	if(hp == 0) {
     		gameOver = true;
+    		step();
     	}
     }
     
@@ -282,6 +286,10 @@ public class TDWorld extends World<Actor>
         super.show();
     }    
     	
+    public void setAutorun(boolean r) {
+    	autorun = r;
+    }
+    
     /**
      * This method is called when the user clicks on a location in the
      * WorldFrame.
@@ -303,15 +311,11 @@ public class TDWorld extends World<Actor>
 		        	if(choice == null)
 		        		return true;
 		        	if(choice.toString().contains("Upgrade")) {
-		        		if(gold >= tower.getUpgradeCost()[tower.getLevel() - 1]) {
-		        			gold -= tower.getUpgradeCost()[tower.getLevel() - 1];
-		        			tower.levelUp();
-		        			System.out.println("Congratulations, your structure is now level " + tower.getLevel() + "!");
-		        			menu.updateGold();
-		        			printGold();
-		        		} else {
-		        			System.out.println("Sorry, but you need " + tower.getUpgradeCost()[tower.getLevel() - 1] + " gold to upgrade this structure.");
-		        		}
+		        		int currentLevel = tower.getLevel();
+		        		tower.upgrade();
+		        		menu.updateGold();
+		        		if(tower.getLevel() != currentLevel) //was the upgrade successful?
+		        			System.out.println("You spent " + tower.getUpgradeCost()[tower.getLevel() - 2] + " to upgrade your turret. You now have " + gold + " gold.");
 		        	} else if (choice.toString().contains("Remove")) {
 		        		remove(loc);
 		        		int toRefund;
@@ -319,10 +323,11 @@ public class TDWorld extends World<Actor>
 		        			toRefund = (int) (0.7 * (double)(tower.getCost()));
 		        		else
 		        			toRefund = (int) (0.7 * (double)(tower.getCost() + tower.getUpgradeCost()[tower.getLevel() - 2]));
-		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
 		        		gold += toRefund;
+		        		System.out.println("You have been refunded " + toRefund + " gold. You now have " + gold + " gold.");
 		        		menu.updateGold();
 		        	} else if (choice.toString().contains("Info")) {
+		        		JOptionPane.showMessageDialog(null,"This tower is level " + tower.getLevel() + ".","Tower Info",JOptionPane.PLAIN_MESSAGE);
 		        		System.out.println("This tower is level " + tower.getLevel() +".");
 		        	}
         		} else {
@@ -348,6 +353,9 @@ public class TDWorld extends World<Actor>
         	}
         }
         
+        if(getGrid().get(loc) != null)
+        	return true;
+        
     	if(nextToAdd == null)
     		return true;
         if(!isValidPlacement(loc))
@@ -365,8 +373,8 @@ public class TDWorld extends World<Actor>
         } 
         else if (nextToAdd instanceof Minion)
         {
-                if(cheats)
-                    add(loc, nextToAdd);
+//                if(cheats)
+//                    add(loc, nextToAdd);
     	} 
         else 
         {
@@ -381,7 +389,6 @@ public class TDWorld extends World<Actor>
     	}
         
     	return true;
-        //return false;
     }
 
 	/*
@@ -429,8 +436,8 @@ public class TDWorld extends World<Actor>
     }
 	
     public void updateHighscores() {
-    	String playerName = "";
-    	while(playerName.equals(""))
+    	String playerName = null;
+    	while(playerName == null)
     		playerName = JOptionPane.showInputDialog("Name?");
     	boolean largest = true;
     	for(Player p : highscores) {
@@ -453,6 +460,7 @@ public class TDWorld extends World<Actor>
     
     public void writeHighscores() {
     	try {
+    		Collections.sort(highscores);
 			PrintWriter out = new PrintWriter(new File("highscores.dat"));
 			for(Player p : highscores) {
 				out.println(p.getName() + "::" + p.getScore());
@@ -469,19 +477,19 @@ public class TDWorld extends World<Actor>
      */
     public void step()
     {
-    	if(!gameStarted) {
-        	gameStarted = true;
-    	}
-    	if(timer > 0) {
-    		timer--;
-    		return;
-    	}
     	if(gameOver) {
     		if(!gameOverMsg) {
     			System.out.println("Game over. Please reload GridDefense to start a new game.");
     			gameOverMsg = true;
     			updateHighscores();
     		}
+    		return;
+    	}
+    	if(!gameStarted) {
+        	gameStarted = true;
+    	}
+    	if(timer > 0) {
+    		timer--;
     		return;
     	}
         Grid<Actor> gr = getGrid();
@@ -523,12 +531,14 @@ public class TDWorld extends World<Actor>
         	timer = 10;
         	level++;
         	minionsAdded = 0;
-        	System.out.println("Congratulations! Wave " + (level) + " will commence when you press Run.");
-                System.out.println("Minions: " + 2 * level);
-                System.out.println("Minion health: " + level * level * 2);
-                
-                printGold();
-            justFinished = true;
+        	if(autorun) {
+	        	System.out.println("Congratulations! Wave " + (level) + " will commence when you press Run.");
+	            justFinished = true;
+        	}
+        	System.out.println("Info on wave " + level);
+            System.out.println("Minions: " + 2 * level);
+            System.out.println("Minion health: " + level * level * 2);   
+            printGold();
         }
     }
 

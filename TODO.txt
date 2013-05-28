@@ -1,8 +1,6 @@
-*menu
-*high scores
-*don't allow user to place or remove minions
-*auto stop after each wave
+*add ability to remove barricades for a refund
 *tutorial
-*allow user to upgrade barricades
 *comment new files
-*instantiate with bigger grid
+*firetower, watertower, magetower, moneyhut pictures not updating when upgrading
+*when a user upgrades, he doesn't get 70% of his money back
+*banks generate too much gold 

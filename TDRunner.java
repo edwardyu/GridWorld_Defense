@@ -54,8 +54,10 @@ public class TDRunner
 					System.out.println(world.getGold());
 				break;
 				case "addgold":
-					if(world.cheats)
-						world.addGold(1000);
+					if(world.cheats) {
+						System.out.println("cheat code for 10k gold activated");
+						world.addGold(10000);
+					}
 				break;
 				case "barricade":
 				case "firetower":
