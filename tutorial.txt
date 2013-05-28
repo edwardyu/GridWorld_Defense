@@ -1,0 +1,22 @@
+**Basics**
+GridDefense is a tower defense game. The objective of the game is to stop the minions from getting to the end square. 
+The start square is in the bottom left corner, and the end square is in the top right corner. They are marked by green squares. 
+
+**Barricade**
+A barricade prevents a minion from reaching that square, but it does not attack or damage the minion.
+
+**BasicTower**
+A BasicTower randomly selects a minion adjacent to it and inflicts damage to it.
+
+**WaterTower**
+A WaterTower damages a minion in all cardinal directions. (It attack squares are the same as a rook in chess.)
+It is blocked by barricades and other towers.
+
+**FireTower**
+A FireTower damages all minions adjacent to it.
+
+**MageTower**
+A MageTower damages all minions adjacent to it, usually killing it instantly.
+
+**MoneyHut**
+A MoneyHut generates money. It is an investment, and does not attack or damage minions.

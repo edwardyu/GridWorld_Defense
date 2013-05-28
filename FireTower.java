@@ -1,7 +1,7 @@
 package td;
 /*
  * FireTower.java
- * A FireTower damages all minions adjacent to it, and also applies fire damage, which burns the minion over a period of time.
+ * A FireTower damages all minions adjacent to it.
  * @author Edward Yu, Ronbo Fan
  * Period: 6
  * Date: 5/19/13

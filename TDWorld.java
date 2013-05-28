@@ -523,7 +523,7 @@ public class TDWorld extends World<Actor>
         boolean allDead = true;
         for(Location loc : gr.getOccupiedLocations()) {
         	if(gr.get(loc) instanceof Minion)
-        		allDead = false;
+        		allDead = false; 
         }
         if(allDead) {
         	gold += getGoldBonus();
